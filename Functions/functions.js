@@ -128,7 +128,7 @@ export const generateToken = async (email) => {
   let status = {
     success: false,
     token: null,
-    date: null,
+    time: null,
     err: null,
   };
   try {
@@ -144,15 +144,16 @@ export const generateToken = async (email) => {
       console.log("Document already exists");
     } else {
       const date = new Date();
+      const time = getTimeFromDate(date);
       await setDoc(docRef, {
         name: studentData.name,
         id: studentData.id,
-        timestamp: date,
+        timestamp: time,
         isCollected: false,
       });
       status.success = true;
       status.token = tokenNumber;
-      status.date = date
+      status.time = time
     }
   } catch (e) {
     console.log(e);

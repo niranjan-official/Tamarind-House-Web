@@ -26,9 +26,7 @@ const page = () => {
     const status = await generateToken(email);
     if(status.success){
       setToken(status.token);
-      const time = getTimeFromDate(status.date);
-      console.log(time);
-      setTime(time);
+      setTime(status.time);
     }
     setLoad(false);
   }
