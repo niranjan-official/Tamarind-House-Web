@@ -61,18 +61,26 @@ export const handleSignup = async (
   return status;
 };
 
-export const handleLogin = async (form) => {
+export const handleLogin = async (email,form) => {
   console.log(form);
   const status = {
     success: false,
     otp: null,
     err: null,
+    notValid: false
   };
   try {
-    const send = await sendEmail(form);
-    if (send.success) {
-      status.otp = send.otp;
-      status.success = true;
+    const docRef = doc(db, "users", email);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const send = await sendEmail(form);
+      if (send.success) {
+        status.otp = send.otp;
+        status.success = true;
+      }
+    }else{
+      status.notValid = true;
     }
   } catch (error) {
     console.log(error);

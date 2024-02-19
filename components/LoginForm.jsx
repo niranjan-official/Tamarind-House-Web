@@ -26,7 +26,7 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoad(true);
-    const status = await handleLogin(form.current);
+    const status = await handleLogin(data.email,form.current);
     if(status.success){
       const otpData = {
         method: "login",
@@ -36,7 +36,16 @@ const LoginForm = () => {
       };
       localStorage.setItem("otp", JSON.stringify(otpData));
       router.push("/otp");
+    } else if (status.notValid) {
+      setLoad(false);
+      setState("Not a valid Email");
+    } else{
+      setLoad(false);
+      setState("Unknown error occured !!");
     }
+    setTimeout(() => {
+      setState("");
+    }, 3000);
   };
   const inputs = [
     {

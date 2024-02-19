@@ -1,6 +1,6 @@
 "use client";
 import { generateToken, getTimeFromDate } from "@/Functions/functions";
-import { Router } from "lucide-react";
+import { useAuth } from "@/firebase/auth";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 
@@ -13,11 +13,11 @@ const page = () => {
   const [time, setTime] = useState('');
 
   useLayoutEffect(()=>{
-    const userEmail = JSON.parse(localStorage.getItem("studentEmail"));
-    if(!userEmail){
+    const userData = JSON.parse(localStorage.getItem("studentData"));
+    if(!userData){
       Router.push("/login");
     }else{
-      setEmail(userEmail);
+      setEmail(userData.email);
     }
   },[])
 
@@ -74,6 +74,7 @@ const page = () => {
       </div>
     </div>
   );
-};
+}
+
 
 export default page;

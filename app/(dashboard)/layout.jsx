@@ -1,14 +1,22 @@
 "use client";
 
+import { useAuth } from "@/firebase/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Loading from "./loading";
 
 export default function Layout({ children }) {
+
   const pathname = usePathname();
+  const User = useAuth();
 
   return (
     <div className="flex min-h-screen bg-secondary">
-      <div className="flex flex-1 p-4 pb-16">{children}</div>
+      <div className="flex flex-1 p-4 pb-16">
+        {
+          User ? children : <Loading/>
+        }
+        </div>
       <div className="fixed bottom-0 flex justify-evenly w-full h-16 bg-white text-gray-400 text-2xl rounded-t-xl shadow-2xl">
         <div
           className={`flex flex-col w-1/3 justify-center items-center ${
