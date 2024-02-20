@@ -144,18 +144,24 @@ export const checkTokenExistence = async (email) => {
   try {
     const studentData = await getData(email);
     const currentDate = new Date();
-    let timeExist = true;
-    if(studentData.tokenTime){
-      timeExist = isDateGreaterThan(studentData.tokenTime,currentDate)
+    let timeChange = true;
+    if (studentData.tokenTime) {
+      timeChange = isDateGreaterThan(convertTime(studentData.tokenTime), currentDate);
+      console.log(">>>>>",timeChange);
     }
-    if (timeExist) {
+    if (timeChange) {
       status.data = studentData;
-      console.log("generatedTime: ",studentData.tokenTime+" Current: ",currentDate);
-    }else{
+      console.log(
+        "generatedTime: ",
+        studentData.tokenTime + " Current: ",
+        currentDate
+      );
+    } else {
       console.log("hihihi");
+      const newTime = convertTime(studentData.tokenTime);
       status.tokenExist = true;
       status.token = studentData.token;
-      status.time = getTimeFromDate(studentData.tokenTime);
+      status.time = getTimeFromDate(newTime);
     }
   } catch (e) {
     console.log(e);
@@ -164,8 +170,13 @@ export const checkTokenExistence = async (email) => {
   return status;
 };
 
+const convertTime = (time) => {
+  const milliseconds = time.seconds * 1000 + time.nanoseconds / 1e6;
+  time = new Date(milliseconds);
+  time = time.toString();
+  return time;
+};
 export const generateToken = async (email) => {
-
   let studentData;
   let status = {
     success: false,
@@ -176,16 +187,16 @@ export const generateToken = async (email) => {
   };
 
   const checkToken = await checkTokenExistence(email);
-  
-  if(checkToken.data){
-    try{
+
+  if (checkToken.data) {
+    try {
       studentData = checkToken.data;
       const tokenNumber = Math.floor(100000 + Math.random() * 900000);
       console.log(tokenNumber);
-    
+
       const tokenDocRef = doc(db, "tokens", tokenNumber.toString());
       const docSnap = await getDoc(tokenDocRef);
-    
+
       if (docSnap.exists()) {
         generateToken(email);
         console.log("Document already exists");
@@ -193,29 +204,29 @@ export const generateToken = async (email) => {
         const date = new Date();
         const time = getTimeFromDate(date);
         const batch = writeBatch(db);
-  
+
         batch.set(tokenDocRef, {
           name: studentData.name,
           id: studentData.id,
           timestamp: time,
           isCollected: false,
         });
-  
+
         const studentRef = doc(db, "users", email);
         batch.update(studentRef, {
-          "token" : tokenNumber,
-          "tokenTime" : serverTimestamp(),
+          token: tokenNumber,
+          tokenTime: date,
         });
         await batch.commit();
         status.success = true;
         status.token = tokenNumber;
         status.time = time;
       }
-    }catch(err){
+    } catch (err) {
       status.err = err.message;
       console.log(err.message);
     }
-  }else{
+  } else {
     status.tokenExist = true;
     status.token = checkToken.token;
     status.time = checkToken.tokenTime;
@@ -281,8 +292,11 @@ const getData = async (email) => {
 };
 
 export const getTimeFromDate = (date) => {
-  const hours = date.getHours();
-  const minutes = date.getMinutes();
+  console.log("New Date:1 ",date);
+  const newDate = new Date(date);
+  console.log("New Date:2 ",newDate);
+  const hours = newDate.getHours();
+  const minutes = newDate.getMinutes();
 
   const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
 
@@ -294,17 +308,15 @@ export const getTimeFromDate = (date) => {
 };
 
 function isDateGreaterThan(date1, date2) {
-  console.log("Dates: ",date1,date2);
-  if(!date1){
-    return false;
-  }
+  
   var d1 = new Date(date1);
   var d2 = new Date(date2);
+  console.log("Dates: ", d1, d2);
+  
   d1.setHours(0, 0, 0, 0);
   d2.setHours(0, 0, 0, 0);
-  
-  return d1.getTime() > d2.getTime();
 
+  return d1.getTime() < d2.getTime();
 }
 
 // const TokenExistance = async () => {
