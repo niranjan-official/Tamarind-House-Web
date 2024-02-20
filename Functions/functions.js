@@ -4,6 +4,7 @@ import {
   serverTimestamp,
   setDoc,
   updateDoc,
+  writeBatch,
 } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 import {
@@ -61,13 +62,13 @@ export const handleSignup = async (
   return status;
 };
 
-export const handleLogin = async (email,form) => {
+export const handleLogin = async (email, form) => {
   console.log(form);
   const status = {
     success: false,
     otp: null,
     err: null,
-    notValid: false
+    notValid: false,
   };
   try {
     const docRef = doc(db, "users", email);
@@ -79,7 +80,7 @@ export const handleLogin = async (email,form) => {
         status.otp = send.otp;
         status.success = true;
       }
-    }else{
+    } else {
       status.notValid = true;
     }
   } catch (error) {
@@ -132,40 +133,92 @@ export const createUser = async (email, password) => {
   return status;
 };
 
-export const generateToken = async (email) => {
+export const checkTokenExistence = async (email) => {
   let status = {
-    success: false,
+    data: null,
+    tokenExist: false,
     token: null,
     time: null,
     err: null,
   };
   try {
     const studentData = await getData(email);
-    const tokenNumber = Math.floor(100000 + Math.random() * 900000);
-    console.log(tokenNumber);
-
-    const docRef = doc(db, "tokens", tokenNumber.toString());
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      generateToken(email);
-      console.log("Document already exists");
-    } else {
-      const date = new Date();
-      const time = getTimeFromDate(date);
-      await setDoc(docRef, {
-        name: studentData.name,
-        id: studentData.id,
-        timestamp: time,
-        isCollected: false,
-      });
-      status.success = true;
-      status.token = tokenNumber;
-      status.time = time
+    const currentDate = new Date();
+    let timeExist = true;
+    if(studentData.tokenTime){
+      timeExist = isDateGreaterThan(studentData.tokenTime,currentDate)
+    }
+    if (timeExist) {
+      status.data = studentData;
+      console.log("generatedTime: ",studentData.tokenTime+" Current: ",currentDate);
+    }else{
+      console.log("hihihi");
+      status.tokenExist = true;
+      status.token = studentData.token;
+      status.time = getTimeFromDate(studentData.tokenTime);
     }
   } catch (e) {
     console.log(e);
     status.err = e.message;
+  }
+  return status;
+};
+
+export const generateToken = async (email) => {
+
+  let studentData;
+  let status = {
+    success: false,
+    tokenExist: false,
+    token: null,
+    time: null,
+    err: null,
+  };
+
+  const checkToken = await checkTokenExistence(email);
+  
+  if(checkToken.data){
+    try{
+      studentData = checkToken.data;
+      const tokenNumber = Math.floor(100000 + Math.random() * 900000);
+      console.log(tokenNumber);
+    
+      const tokenDocRef = doc(db, "tokens", tokenNumber.toString());
+      const docSnap = await getDoc(tokenDocRef);
+    
+      if (docSnap.exists()) {
+        generateToken(email);
+        console.log("Document already exists");
+      } else {
+        const date = new Date();
+        const time = getTimeFromDate(date);
+        const batch = writeBatch(db);
+  
+        batch.set(tokenDocRef, {
+          name: studentData.name,
+          id: studentData.id,
+          timestamp: time,
+          isCollected: false,
+        });
+  
+        const studentRef = doc(db, "users", email);
+        batch.update(studentRef, {
+          "token" : tokenNumber,
+          "tokenTime" : serverTimestamp(),
+        });
+        await batch.commit();
+        status.success = true;
+        status.token = tokenNumber;
+        status.time = time;
+      }
+    }catch(err){
+      status.err = err.message;
+      console.log(err.message);
+    }
+  }else{
+    status.tokenExist = true;
+    status.token = checkToken.token;
+    status.time = checkToken.tokenTime;
   }
   return status;
 };
@@ -206,31 +259,31 @@ const sendEmail = async (form) => {
   return status;
 };
 
-
-const getData = async(email) =>{
-  try{
+const getData = async (email) => {
+  try {
     const docRef = doc(db, "users", email);
     const docSnap = await getDoc(docRef);
-  
+
     if (docSnap.exists()) {
       const data = {
         id: docSnap.data().id,
-        name: docSnap.data().name
-      }
+        name: docSnap.data().name,
+        token: docSnap.data().token,
+        tokenTime: docSnap.data().tokenTime,
+      };
       return data;
     } else {
       return null;
     }
-  }catch(err){
+  } catch (err) {
     alert(err.message);
   }
-}
+};
 
 export const getTimeFromDate = (date) => {
-
   const hours = date.getHours();
   const minutes = date.getMinutes();
-  
+
   const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
 
   const period = hours < 12 ? "AM" : "PM";
@@ -238,6 +291,20 @@ export const getTimeFromDate = (date) => {
   const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
 
   return `${formattedHours}:${formattedMinutes} ${period}`;
+};
+
+function isDateGreaterThan(date1, date2) {
+  console.log("Dates: ",date1,date2);
+  if(!date1){
+    return false;
+  }
+  var d1 = new Date(date1);
+  var d2 = new Date(date2);
+  d1.setHours(0, 0, 0, 0);
+  d2.setHours(0, 0, 0, 0);
+  
+  return d1.getTime() > d2.getTime();
+
 }
 
 // const TokenExistance = async () => {
