@@ -1,6 +1,8 @@
 import {
+  collection,
   doc,
   getDoc,
+  getDocs,
   serverTimestamp,
   setDoc,
   updateDoc,
@@ -146,8 +148,10 @@ export const checkTokenExistence = async (email) => {
     const currentDate = new Date();
     let timeChange = true;
     if (studentData.tokenTime) {
-      timeChange = isDateGreaterThan(convertTime(studentData.tokenTime), currentDate);
-      console.log(">>>>>",timeChange);
+      timeChange = isDateGreaterThan(
+        convertTime(studentData.tokenTime),
+        currentDate
+      );
     }
     if (timeChange) {
       status.data = studentData;
@@ -157,7 +161,6 @@ export const checkTokenExistence = async (email) => {
         currentDate
       );
     } else {
-      console.log("hihihi");
       const newTime = convertTime(studentData.tokenTime);
       status.tokenExist = true;
       status.token = studentData.token;
@@ -186,11 +189,14 @@ export const generateToken = async (email) => {
     err: null,
   };
 
-  const checkToken = await checkTokenExistence(email);
+  // const checkToken = await checkTokenExistence(email);
 
-  if (checkToken.data) {
+  // if (checkToken.data) {
+
     try {
-      studentData = checkToken.data;
+      // temporary 
+      const studentData = await getData(email);
+      // studentData = checkToken.data;
       const tokenNumber = Math.floor(100000 + Math.random() * 900000);
       console.log(tokenNumber);
 
@@ -226,11 +232,11 @@ export const generateToken = async (email) => {
       status.err = err.message;
       console.log(err.message);
     }
-  } else {
-    status.tokenExist = true;
-    status.token = checkToken.token;
-    status.time = checkToken.tokenTime;
-  }
+  // } else {
+  //   status.tokenExist = true;
+  //   status.token = checkToken.token;
+  //   status.time = checkToken.tokenTime;
+  // }
   return status;
 };
 
@@ -292,9 +298,9 @@ const getData = async (email) => {
 };
 
 export const getTimeFromDate = (date) => {
-  console.log("New Date:1 ",date);
+  console.log("New Date:1 ", date);
   const newDate = new Date(date);
-  console.log("New Date:2 ",newDate);
+  console.log("New Date:2 ", newDate);
   const hours = newDate.getHours();
   const minutes = newDate.getMinutes();
 
@@ -308,31 +314,53 @@ export const getTimeFromDate = (date) => {
 };
 
 function isDateGreaterThan(date1, date2) {
-  
   var d1 = new Date(date1);
   var d2 = new Date(date2);
   console.log("Dates: ", d1, d2);
-  
+
   d1.setHours(0, 0, 0, 0);
   d2.setHours(0, 0, 0, 0);
 
   return d1.getTime() < d2.getTime();
 }
 
-// const TokenExistance = async () => {
+export const getStudentTokenHistory = async (email) => {
+  const userData = await getData(email);
+  let data;
+  let studentHistory =  [];
+  try {
+    const docRef = doc(db, "user-history", userData.id);
+    const docSnap = await getDoc(docRef);
 
-//   let status = {
-//     success: false,
-//     error: null,
-//   };
+    if (docSnap.exists()) {
+      data = docSnap.data();
+      console.log(data);
+    } else {
+      console.log("No such document!");
+    }
+    Object.entries(data).forEach(([key, value]) => {
+        studentHistory.push({key,value})
+    });
+    return studentHistory;
+  } catch (err) {
+    console.log(err.message);
+  }
+};
 
-//   const docRef = doc(db, "tokens", "--");
-//   const docSnap = await getDoc(docRef);
+const formatDate = (date) => {
+  // Get day, month, and year
+  var day = date.getDate();
+  var month = date.getMonth() + 1; // Month starts from 0
+  var year = date.getFullYear();
 
-//   if (docSnap.exists()) {
-//     console.log("Document data:", docSnap.data());
-//   } else {
-//     // docSnap.data() will be undefined in this case
-//     console.log("No such document!");
-//   }
-// };
+  // Add leading zeros if needed
+  if (day < 10) {
+    day = "0" + day;
+  }
+  if (month < 10) {
+    month = "0" + month;
+  }
+
+  // Return formatted date
+  return day + "-" + month + "-" + year;
+};

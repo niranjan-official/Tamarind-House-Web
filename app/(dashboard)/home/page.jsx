@@ -2,16 +2,15 @@
 import { checkTokenExistence, generateToken} from "@/Functions/functions";
 import { useRouter } from "next/navigation";
 import React, {  useEffect, useLayoutEffect, useState } from "react";
-import Loading from "../loading";
 
 const page = () => {
 
   const Router = useRouter();
   const [email, setEmail] = useState('');
   const [token, setToken] = useState("");
-  const [tokenLoad, setTokenLoad] = useState(true);
+  // temporary false
+  const [tokenLoad, setTokenLoad] = useState(false);
   const [time, setTime] = useState('');
-
 
   useLayoutEffect(()=>{
     const userData = JSON.parse(localStorage.getItem("studentData"));
@@ -21,23 +20,23 @@ const page = () => {
       setEmail(userData.email);
     }
   },[])
-useEffect(()=>{
-  if(email){
-    checkToken(email)
-  }
-},[email])
-  const checkToken = async(email) =>{
-    console.log(email);
-    const status = await checkTokenExistence(email);
-    console.log("checkToken: ",status);
-    if(status.tokenExist){
-      setToken(status.token);
-      setTime(status.time);
-    }else if(status.err){
-      alert("Unknown error occured.. Refresh your page !!")
-    }
-    setTokenLoad(false);
-  }
+// useEffect(()=>{
+//   if(email){
+//     checkToken(email)
+//   }
+// },[email])
+  // const checkToken = async(email) =>{
+  //   console.log(email);
+  //   const status = await checkTokenExistence(email);
+  //   console.log("checkToken: ",status);
+  //   if(status.tokenExist){
+  //     setToken(status.token);
+  //     setTime(status.time);
+  //   }else if(status.err){
+  //     alert("Unknown error occured.. Refresh your page !!")
+  //   }
+  //   setTokenLoad(false);
+  // }
 
   const TokenGeneration = async() =>{
     setTokenLoad(true);

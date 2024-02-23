@@ -4,6 +4,7 @@ import { useAuth } from "@/firebase/auth";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Loading from "./loading";
+import Header from "@/components/Header";
 
 export default function Layout({ children }) {
 
@@ -11,8 +12,9 @@ export default function Layout({ children }) {
   const User = useAuth();
 
   return (
-    <div className="flex min-h-screen bg-secondary">
-      <div className="flex flex-1 p-4 pb-16">
+    <div className="flex flex-col min-h-screen bg-secondary">
+      <Header/>
+      <div className="flex flex-1 p-4 pt-20 pb-16">
         {
           User ? children : <Loading/>
         }
