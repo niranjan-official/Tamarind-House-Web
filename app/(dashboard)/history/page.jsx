@@ -33,7 +33,7 @@ const History = () => {
   }
   if(!load){
     return (
-      <div className='w-full flex flex-1 flex-col gap-4 py-4 overflow-y-scroll'>
+      <div className='w-full flex flex-1 flex-col gap-4 p-4 overflow-y-scroll'>
         {
           studentHistory ? 
           studentHistory.map((obj,key)=>{

@@ -214,8 +214,9 @@ export const generateToken = async (email) => {
         batch.set(tokenDocRef, {
           name: studentData.name,
           id: studentData.id,
-          timestamp: time,
+          generationTime: time,
           isCollected: false,
+          date: formatDate(date),
         });
 
         const studentRef = doc(db, "users", email);

@@ -51,7 +51,7 @@ const page = () => {
   }
 
   return (
-    <div className="flex flex-col flex-1 justify-center items-center ">
+    <div className="flex flex-col flex-1 justify-center items-center p-4">
       <div className="w-44 flex flex-col bg-primary rounded-3xl px-2 justify-evenly">
         <div className="h-14 flex justify-center items-center">
           <h2 className="text-secondary text-2xl">TOKEN NO :</h2>

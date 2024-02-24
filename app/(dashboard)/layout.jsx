@@ -14,7 +14,7 @@ export default function Layout({ children }) {
   return (
     <div className="flex flex-col min-h-screen bg-secondary">
       <Header/>
-      <div className="flex flex-1 p-4 pt-20 pb-16">
+      <div className="flex flex-1 pt-20 pb-16">
         {
           User ? children : <Loading/>
         }
