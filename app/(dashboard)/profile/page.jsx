@@ -1,6 +1,49 @@
-import React from "react";
+'use client'
+import { convertTime, formatDate, getData } from "@/Functions/functions";
+import React, { useEffect, useLayoutEffect, useState } from "react";
+import Loading from "../loading";
 
 const Profile = () => {
+
+  const [email, setEmail] = useState('');
+  const [data, setData] = useState({
+    name: '',
+    id: '',
+    dateOfReg: '',
+  })
+  const [load, setLoad] = useState(true);
+
+  useLayoutEffect(()=>{
+    const userData = JSON.parse(localStorage.getItem("studentData"));
+    if(userData){
+      setEmail(userData.email);
+    }
+  },[])
+
+  useEffect(()=>{
+    if(email){
+      fetchData();
+    }
+  },[email])
+
+  const fetchData = async() =>{
+    const data = await getData(email);
+    if(data){
+      const date = convertTime(data.dateOfReg);
+      const newDate = new Date(date);
+      console.log("Date: ",data.dateOfReg);
+      console.log(newDate);
+      setData({
+        name: data.name,
+        id: data.id,
+        dateOfReg: formatDate(newDate)
+      });
+      setLoad(false);
+    }else{
+      alert("Unknown error occured !!")
+    }
+  }
+if(!load){
   return (
     <div className="w-full flex flex-col flex-1">
       <div className="w-full h-1/3 flex justify-center bg-primary rounded-b-[50%]">
@@ -35,7 +78,7 @@ const Profile = () => {
               d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
             />
           </svg>
-          <h1 className="text-xl text-gray-500">Niranjan Sabarinath</h1>
+          <h1 className="text-xl text-gray-500">{data?.name}</h1>
         </div>
         <hr />
         <div className="w-full p-6 pr-0 flex items-center gap-8">
@@ -54,17 +97,17 @@ const Profile = () => {
             />
           </svg>
 
-          <h1 className="text-xl text-gray-500">PRC22CS037</h1>
+          <h1 className="text-xl text-gray-500">{data?.id}</h1>
         </div>
         <hr />
-        <div className="w-full p-6 pr-2 gap-8 flex items-center break-all">
+        <div className="w-full p-6 pr-4 gap-8 flex items-center break-all">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 24 24"
             strokeWidth={1.5}
             stroke="currentColor"
-            className="w-8 h-8 text-red-950"
+            className="w-6 h-6 text-red-950"
           >
             <path
               strokeLinecap="round"
@@ -73,7 +116,7 @@ const Profile = () => {
             />
           </svg>
 
-          <h1 className=" text-gray-500">niranjan.prc22cs037@student.providence.edu.in</h1>
+          <h1 className=" text-gray-500">{email}</h1>
         </div>
         <hr />
         <div className="w-full p-6 pr-0 flex items-center gap-8">
@@ -92,12 +135,15 @@ const Profile = () => {
             />
           </svg>
 
-          <h1 className="text-xl text-gray-500">12-01-2024</h1>
+          <h1 className="text-xl text-gray-500">{data?.dateOfReg}</h1>
         </div>
         <hr />
       </div>
     </div>
   );
+}else{
+  return <Loading/> ;
+}
 };
 
 export default Profile;

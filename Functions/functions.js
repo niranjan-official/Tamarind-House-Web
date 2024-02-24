@@ -173,7 +173,7 @@ export const checkTokenExistence = async (email) => {
   return status;
 };
 
-const convertTime = (time) => {
+export const convertTime = (time) => {
   const milliseconds = time.seconds * 1000 + time.nanoseconds / 1e6;
   time = new Date(milliseconds);
   time = time.toString();
@@ -277,7 +277,7 @@ const sendEmail = async (form) => {
   return status;
 };
 
-const getData = async (email) => {
+export const getData = async (email) => {
   try {
     const docRef = doc(db, "users", email);
     const docSnap = await getDoc(docRef);
@@ -286,6 +286,7 @@ const getData = async (email) => {
       const data = {
         id: docSnap.data().id,
         name: docSnap.data().name,
+        dateOfReg: docSnap.data().dateOfReg,
         token: docSnap.data().token,
         tokenTime: docSnap.data().tokenTime,
       };
@@ -348,7 +349,7 @@ export const getStudentTokenHistory = async (email) => {
   }
 };
 
-const formatDate = (date) => {
+export const formatDate = (date) => {
   // Get day, month, and year
   var day = date.getDate();
   var month = date.getMonth() + 1; // Month starts from 0

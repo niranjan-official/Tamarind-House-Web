@@ -14,9 +14,7 @@ const page = () => {
 
   useLayoutEffect(()=>{
     const userData = JSON.parse(localStorage.getItem("studentData"));
-    if(!userData){
-      Router.push("/login");
-    }else{
+    if(userData){
       setEmail(userData.email);
     }
   },[])
