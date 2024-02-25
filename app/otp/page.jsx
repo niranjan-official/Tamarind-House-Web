@@ -1,5 +1,5 @@
 "use client";
-import { Login, createUser } from "@/Functions/functions";
+import { Login, Signup } from "@/Functions/functions";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
@@ -56,7 +56,7 @@ const OTP = () => {
       const userData = JSON.parse(localStorage.getItem("otp"));
       let status;
       if(userData.method === "signup"){
-        status = await createUser(
+        status = await Signup(
           userData.email,
           userData.password,
         );
@@ -86,6 +86,7 @@ const OTP = () => {
           width={0}
           height={0}
           style={{ width: "100%", height: "auto" }}
+          alt="otp poster"
         />
       </div>
       <h1 className="text-3xl font-bold text-primary mt-4">OTP Verification</h1>

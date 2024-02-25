@@ -3,7 +3,10 @@
 @tailwind utilities;
  
 .input{
-    @apply w-full bg-transparent border-b p-1 mb-5 border-gray-500 focus:outline-none focus:ring-0 hover:border-b-2 hover:border-red-900
+    @apply w-full border-b mb-5 border-gray-500 hover:border-b-2 hover:border-red-900
+}
+.input input{
+    @apply w-full bg-transparent p-1 focus:outline-none focus:ring-0 
 }
 .button{
     @apply flex items-center justify-center gap-2 p-3 text-secondary shadow-md bg-primary hover:bg-red-900 disabled:bg-red-900

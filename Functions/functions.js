@@ -1,9 +1,6 @@
 import {
-  collection,
   doc,
   getDoc,
-  getDocs,
-  serverTimestamp,
   setDoc,
   updateDoc,
   writeBatch,
@@ -15,11 +12,21 @@ import {
 } from "firebase/auth";
 import emailjs from "@emailjs/browser";
 
+
+// Generates OTP for both login and signup
+const generateOTP = () => {
+  let randomNumber = "";
+  for (let i = 0; i < 4; i++) {
+    randomNumber += Math.floor(Math.random() * 10);
+  }
+  return randomNumber;
+};
+
+// checks whether the student is a hosteler or not and sends the otp for verification
 export const handleSignup = async (
   studentID,
   username,
   email,
-  password,
   form
 ) => {
   let status = {
@@ -64,6 +71,32 @@ export const handleSignup = async (
   return status;
 };
 
+// Invokes when the otp matches and creates account
+export const Signup = async (email, password) => {
+  const status = {
+    success: false,
+    err: null,
+  };
+  try {
+    await createUserWithEmailAndPassword(
+      auth,
+      email,
+      password
+    );
+    const washingtonRef = doc(db, "users", email);
+    await updateDoc(washingtonRef, {
+      dateOfReg: new Date(),
+    });
+    status.success = true;
+  } catch (error) {
+    status.err = error;
+    alert(error.message);
+  }
+  console.log("Student Enrolled succesfully !!");
+  return status;
+};
+
+// check whether the student exist and sends otp for verification
 export const handleLogin = async (email, form) => {
   console.log(form);
   const status = {
@@ -92,13 +125,14 @@ export const handleLogin = async (email, form) => {
   return status;
 };
 
+// Invokes when the otp matches and login the user
 export const Login = async (email, password) => {
   const status = {
     success: false,
     err: null,
   };
   try {
-    const userCredential = await signInWithEmailAndPassword(
+    await signInWithEmailAndPassword(
       auth,
       email,
       password
@@ -111,30 +145,36 @@ export const Login = async (email, password) => {
   return status;
 };
 
-export const createUser = async (email, password) => {
-  const status = {
+// Sends otp to the student via email
+const sendEmail = async (form) => {
+  let status = {
     success: false,
-    err: null,
+    otp: null,
+    error: null,
   };
-  try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
+  const otp = generateOTP();
+  form.otp.value = otp;
+
+  await emailjs
+    .sendForm("service_vwwafuc", "template_ujysduq", form, {
+      publicKey: "OWoHGZ94EI8Pn8jAU",
+    })
+    .then(
+      () => {
+        console.log("SUCCESS!");
+        console.log("Your OTP:", otp);
+        status.success = true;
+        status.otp = otp;
+      },
+      (error) => {
+        console.log("FAILED...", error.text);
+        status.error = error;
+      }
     );
-    const washingtonRef = doc(db, "users", email);
-    await updateDoc(washingtonRef, {
-      dateOfReg: new Date(),
-    });
-    status.success = true;
-  } catch (error) {
-    status.err = error;
-    alert(error.message);
-  }
-  console.log("Student Enrolled succesfully !!");
   return status;
 };
 
+// Check whether the user have already generated token on that particular day
 export const checkTokenExistence = async (email) => {
   let status = {
     data: null,
@@ -146,6 +186,7 @@ export const checkTokenExistence = async (email) => {
   try {
     const studentData = await getData(email);
     const currentDate = new Date();
+
     let timeChange = true;
     if (studentData.tokenTime) {
       timeChange = isDateGreaterThan(
@@ -173,12 +214,7 @@ export const checkTokenExistence = async (email) => {
   return status;
 };
 
-export const convertTime = (time) => {
-  const milliseconds = time.seconds * 1000 + time.nanoseconds / 1e6;
-  time = new Date(milliseconds);
-  time = time.toString();
-  return time;
-};
+// Generates token for the user 
 export const generateToken = async (email) => {
   let studentData;
   let status = {
@@ -241,91 +277,7 @@ export const generateToken = async (email) => {
   return status;
 };
 
-const generateOTP = () => {
-  let randomNumber = "";
-  for (let i = 0; i < 4; i++) {
-    randomNumber += Math.floor(Math.random() * 10);
-  }
-  return randomNumber;
-};
-
-const sendEmail = async (form) => {
-  let status = {
-    success: false,
-    otp: null,
-    error: null,
-  };
-  const otp = generateOTP();
-  form.otp.value = otp;
-
-  await emailjs
-    .sendForm("service_vwwafuc", "template_ujysduq", form, {
-      publicKey: "OWoHGZ94EI8Pn8jAU",
-    })
-    .then(
-      () => {
-        console.log("SUCCESS!");
-        console.log("Your OTP:", otp);
-        status.success = true;
-        status.otp = otp;
-      },
-      (error) => {
-        console.log("FAILED...", error.text);
-        status.error = error;
-      }
-    );
-  return status;
-};
-
-export const getData = async (email) => {
-  try {
-    const docRef = doc(db, "users", email);
-    const docSnap = await getDoc(docRef);
-
-    if (docSnap.exists()) {
-      const data = {
-        id: docSnap.data().id,
-        name: docSnap.data().name,
-        dateOfReg: docSnap.data().dateOfReg,
-        token: docSnap.data().token,
-        tokenTime: docSnap.data().tokenTime,
-      };
-      return data;
-    } else {
-      return null;
-    }
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-export const getTimeFromDate = (date) => {
-  console.log("New Date:1 ", date);
-  const newDate = new Date(date);
-  console.log("New Date:2 ", newDate);
-  const hours = newDate.getHours();
-  const minutes = newDate.getMinutes();
-
-  const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
-
-  const period = hours < 12 ? "AM" : "PM";
-
-  const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
-
-  return `${formattedHours}:${formattedMinutes} ${period}`;
-};
-
-function isDateGreaterThan(date1, date2) {
-  var d1 = new Date(date1);
-  var d2 = new Date(date2);
-  console.log("Dates: ", d1, d2);
-
-  d1.setHours(0, 0, 0, 0);
-  d2.setHours(0, 0, 0, 0);
-
-  return d1.getTime() < d2.getTime();
-}
-
+// Gets the token generation history of that particular student
 export const getStudentTokenHistory = async (email) => {
   const userData = await getData(email);
   let data;
@@ -349,20 +301,78 @@ export const getStudentTokenHistory = async (email) => {
   }
 };
 
+// Gets the data of the Student
+export const getData = async (email) => {
+  try {
+    const docRef = doc(db, "users", email);
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = {
+        id: docSnap.data().id,
+        name: docSnap.data().name,
+        dateOfReg: docSnap.data().dateOfReg,
+        token: docSnap.data().token,
+        tokenTime: docSnap.data().tokenTime,
+      };
+      return data;
+    } else {
+      return null;
+    }
+  } catch (err) {
+    alert(err.message);
+  }
+};
+
+// converts the date from firebase to normal format
+export const convertTime = (time) => {
+  const milliseconds = time.seconds * 1000 + time.nanoseconds / 1e6;
+  time = new Date(milliseconds);
+  time = time.toString();
+  return time;
+};
+
+// Gets the time from the js date object
+export const getTimeFromDate = (date) => {
+  console.log("New Date:1 ", date);
+  const newDate = new Date(date);
+  console.log("New Date:2 ", newDate);
+  const hours = newDate.getHours();
+  const minutes = newDate.getMinutes();
+
+  const formattedHours = hours % 12 === 0 ? 12 : hours % 12;
+
+  const period = hours < 12 ? "AM" : "PM";
+
+  const formattedMinutes = minutes < 10 ? "0" + minutes : minutes;
+
+  return `${formattedHours}:${formattedMinutes} ${period}`;
+};
+
+// checks if both dates are on the same day
+function isDateGreaterThan(date1, date2) {
+  var d1 = new Date(date1);
+  var d2 = new Date(date2);
+  console.log("Dates: ", d1, d2);
+
+  d1.setHours(0, 0, 0, 0);
+  d2.setHours(0, 0, 0, 0);
+
+  return d1.getTime() < d2.getTime();
+}
+
+// Generate the date from the js date object
 export const formatDate = (date) => {
-  // Get day, month, and year
+
   var day = date.getDate();
-  var month = date.getMonth() + 1; // Month starts from 0
+  var month = date.getMonth() + 1;
   var year = date.getFullYear();
 
-  // Add leading zeros if needed
   if (day < 10) {
     day = "0" + day;
   }
   if (month < 10) {
     month = "0" + month;
   }
-
-  // Return formatted date
   return day + "-" + month + "-" + year;
 };

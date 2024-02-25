@@ -29,33 +29,37 @@ const SignupForm = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoad(true);
-    const status = await handleSignup(
-      data.id,
-      data.username,
-      data.email,
-      data.password,
-      form.current
-    );
-    if (status.success) {
-      const otpData = {
-        method: "signup",
-        otp: status.otp,
-        email: data.email,
-        password: data.password,
-        studentID: data.id
-      };
-      localStorage.setItem("otp", JSON.stringify(otpData));
-      router.push("/otp");
-    } else if (status.notValid) {
-      setLoad(false);
-      setState("Not a valid student");
-    } else if (status.notValidEmail) {
-      setLoad(false);
-      setState("Not a valid email address");
-    } else {
-      setLoad(false);
-      setState("Unknown error occured !!");
+    if(data.password === data.confirm){
+      setLoad(true);
+      const status = await handleSignup(
+        data.id,
+        data.username,
+        data.email,
+        data.password,
+        form.current
+      );
+      if (status.success) {
+        const otpData = {
+          method: "signup",
+          otp: status.otp,
+          email: data.email,
+          password: data.password,
+          studentID: data.id
+        };
+        localStorage.setItem("otp", JSON.stringify(otpData));
+        router.push("/otp");
+      } else if (status.notValid) {
+        setLoad(false);
+        setState("Not a valid student");
+      } else if (status.notValidEmail) {
+        setLoad(false);
+        setState("Not a valid email address");
+      } else {
+        setLoad(false);
+        setState("Unknown error occured !!");
+      }
+    }else{
+      setState("Passwords mismatching ??")
     }
     setTimeout(() => {
       setState("");
@@ -97,11 +101,10 @@ const SignupForm = () => {
     <div className="flex w-full mt-8 flex-col items-center">
       <form ref={form} onSubmit={handleSubmit} className="flex flex-col items-center">
         {inputs.map((input, key) => (
-          <div key={key} className="w-full">
+          <div key={key} className="input">
             <input
               type={input.type}
               name={input.name}
-              className="input"
               placeholder={input.label}
               value={input.value}
               onChange={handleChange}
