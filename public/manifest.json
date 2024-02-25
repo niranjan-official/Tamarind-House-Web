@@ -452,9 +452,9 @@
       "sizes": "1024x1024"
     }
   ],
-  "theme_color": "#FFFFFF",
-  "background_color": "#FFFFFF",
-  "start_url": "/login",
+  "theme_color": "#f7f0ed",
+  "background_color": "#f7f0ed",
+  "start_url": "/",
   "display": "standalone",
   "orientation": "portrait"
 }
