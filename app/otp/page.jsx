@@ -68,7 +68,6 @@ const OTP = () => {
         localStorage.removeItem("otp");
         Router.push("/home");
       }
-      setLoad(false);
     } else {
       setOtpError("❌ Wrong OTP Please Check Again");
       setLoad(false)
