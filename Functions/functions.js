@@ -12,21 +12,12 @@ import {
 } from "firebase/auth";
 import emailjs from "@emailjs/browser";
 
-
-// Generates OTP for both login and signup
-const generateOTP = () => {
-  let randomNumber = "";
-  for (let i = 0; i < 4; i++) {
-    randomNumber += Math.floor(Math.random() * 10);
-  }
-  return randomNumber;
-};
-
 // checks whether the student is a hosteler or not and sends the otp for verification
 export const handleSignup = async (
   studentID,
   username,
   email,
+  password,
   form
 ) => {
   let status = {
@@ -42,7 +33,7 @@ export const handleSignup = async (
 
     if (docSnap.exists()) {
       const existingId = docSnap.data().id;
-      console.log(docSnap.data().email);
+      console.log(docSnap.data().id);
       if (existingId === studentID) {
         const send = await sendEmail(form);
         if (send.success) {
@@ -56,6 +47,7 @@ export const handleSignup = async (
           status.success = true;
         } else {
           status.err = send.error;
+          console.log(send.err);
         }
       } else {
         status.notValid = true;
@@ -147,11 +139,13 @@ export const Login = async (email, password) => {
 
 // Sends otp to the student via email
 const sendEmail = async (form) => {
+
   let status = {
     success: false,
     otp: null,
     error: null,
   };
+
   const otp = generateOTP();
   form.otp.value = otp;
 
@@ -172,6 +166,15 @@ const sendEmail = async (form) => {
       }
     );
   return status;
+};
+
+// Generates OTP for both login and signup
+const generateOTP = () => {
+  let randomNumber = "";
+  for (let i = 0; i < 4; i++) {
+    randomNumber += Math.floor(Math.random() * 10);
+  }
+  return randomNumber;
 };
 
 // Check whether the user have already generated token on that particular day

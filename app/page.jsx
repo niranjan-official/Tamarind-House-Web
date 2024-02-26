@@ -8,7 +8,7 @@ export default function Home() {
 
   const User = useAuth();
   const Router = useRouter();
-  
+
  useEffect(()=>{
    if(User){
      Router.replace('/home');
@@ -16,7 +16,7 @@ export default function Home() {
  },[User])
 
     return (
-      <div className="w-full h-screen flex items-center justify-center"><Loading/></div>
+      <div className="w-full h-screen flex items-center justify-center bg-secondary"><Loading/></div>
     )
     
 }
