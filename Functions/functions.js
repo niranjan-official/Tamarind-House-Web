@@ -228,14 +228,14 @@ export const generateToken = async (email) => {
     err: null,
   };
 
-  // const checkToken = await checkTokenExistence(email);
+  const checkToken = await checkTokenExistence(email);
 
-  // if (checkToken.data) {
+  if (checkToken.data) {
 
     try {
       // temporary 
-      const studentData = await getData(email);
-      // studentData = checkToken.data;
+      // const studentData = await getData(email);
+      studentData = checkToken.data;
       const tokenNumber = Math.floor(100000 + Math.random() * 900000);
       console.log(tokenNumber);
 
@@ -272,11 +272,11 @@ export const generateToken = async (email) => {
       status.err = err.message;
       console.log(err.message);
     }
-  // } else {
-  //   status.tokenExist = true;
-  //   status.token = checkToken.token;
-  //   status.time = checkToken.tokenTime;
-  // }
+  } else {
+    status.tokenExist = true;
+    status.token = checkToken.token;
+    status.time = checkToken.tokenTime;
+  }
   return status;
 };
 
