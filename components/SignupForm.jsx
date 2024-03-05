@@ -33,15 +33,14 @@ const SignupForm = () => {
       setLoad(true);
       const status = await handleSignup(
         data.id,
-        data.username,
         data.email,
-        data.password,
         form.current
       );
       if (status.success) {
         const otpData = {
           method: "signup",
           otp: status.otp,
+          username: data.username,
           email: data.email,
           password: data.password,
           studentID: data.id

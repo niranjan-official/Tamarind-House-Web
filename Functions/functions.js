@@ -15,9 +15,7 @@ import emailjs from "@emailjs/browser";
 // checks whether the student is a hosteler or not and sends the otp for verification
 export const handleSignup = async (
   studentID,
-  username,
   email,
-  password,
   form
 ) => {
   let status = {
@@ -37,12 +35,12 @@ export const handleSignup = async (
       if (existingId === studentID) {
         const send = await sendEmail(form);
         if (send.success) {
-          await setDoc(doc(db, "users", email), {
-            name: username,
-            id: studentID,
-            email: email,
-            dateOfReg: new Date(),
-          });
+          // await updateDoc(docRef,{
+          //   name: username,
+          //   id: studentID,
+          //   email: email,
+          //   dateOfReg: new Date(),
+          // });
           status.otp = send.otp;
           status.success = true;
         } else {
@@ -64,7 +62,7 @@ export const handleSignup = async (
 };
 
 // Invokes when the otp matches and creates account
-export const Signup = async (email, password) => {
+export const Signup = async (userData) => {
   const status = {
     success: false,
     err: null,
@@ -72,11 +70,14 @@ export const Signup = async (email, password) => {
   try {
     await createUserWithEmailAndPassword(
       auth,
-      email,
-      password
+      userData.email,
+      userData.password
     );
-    const washingtonRef = doc(db, "users", email);
-    await updateDoc(washingtonRef, {
+    const washingtonRef = doc(db, "users", userData.email);
+    await updateDoc(washingtonRef,{
+      name: userData.username,
+      id: userData.studentID,
+      email: userData.email,
       dateOfReg: new Date(),
     });
     status.success = true;
@@ -256,6 +257,7 @@ export const generateToken = async (email) => {
           generationTime: time,
           isCollected: false,
           date: formatDate(date),
+          gender: studentData.gender
         });
 
         const studentRef = doc(db, "users", email);
@@ -317,6 +319,7 @@ export const getData = async (email) => {
         dateOfReg: docSnap.data().dateOfReg,
         token: docSnap.data().token,
         tokenTime: docSnap.data().tokenTime,
+        gender: docSnap.data().gender
       };
       return data;
     } else {

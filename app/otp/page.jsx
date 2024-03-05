@@ -56,10 +56,7 @@ const OTP = () => {
       const userData = JSON.parse(localStorage.getItem("otp"));
       let status;
       if(userData.method === "signup"){
-        status = await Signup(
-          userData.email,
-          userData.password,
-        );
+        status = await Signup(userData);
       }else{
         status = await Login(userData.email,userData.password);
       }
