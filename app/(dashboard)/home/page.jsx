@@ -1,51 +1,68 @@
 "use client";
-import { checkTokenExistence, generateToken} from "@/Functions/functions";
-import { useRouter } from "next/navigation";
-import React, {  useEffect, useLayoutEffect, useState } from "react";
+import {
+  checkTokenExistence,
+  generateToken,
+  isTokenCollected,
+} from "@/Functions/functions";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 
 const page = () => {
+  const [email, setEmail] = useState("");
 
-  const [email, setEmail] = useState('');
   const [token, setToken] = useState("");
-  // temporary false
   const [tokenLoad, setTokenLoad] = useState(true);
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState("");
 
-  useLayoutEffect(()=>{
+  const [tokenDispensed, setTokenDispensed] = useState(false);
+  const [tokenDispensedLoad, setTokenDispensedLoad] = useState(false);
+
+  useLayoutEffect(() => {
     const userData = JSON.parse(localStorage.getItem("studentData"));
-    if(userData){
+    if (userData) {
       setEmail(userData.email);
     }
-  },[])
-useEffect(()=>{
-  if(email){
-    checkToken(email)
-  }
-},[email])
-  const checkToken = async(email) =>{
+  }, []);
+
+  useEffect(() => {
+    if (email) {
+      checkToken(email);
+    }
+  }, [email]);
+
+  const checkToken = async (email) => {
     console.log(email);
     const status = await checkTokenExistence(email);
-    console.log("checkToken: ",status);
-    if(status.tokenExist){
+    console.log("checkToken: ", status);
+    if (status.tokenExist) {
+      setTokenDispensedLoad(true);
+      tokenCollectionStatus(status.token);
       setToken(status.token);
       setTime(status.time);
-    }else if(status.err){
-      alert("Unknown error occured.. Refresh your page !!")
+    } else if (status.err) {
+      alert("Unknown error occured.. Refresh your page !!");
     }
     setTokenLoad(false);
-  }
+  };
 
-  const TokenGeneration = async() =>{
+  const tokenCollectionStatus = async (tokenNumber) => {
+    const status = await isTokenCollected(tokenNumber);
+    if (status.tokenCollected) {
+      setTokenDispensed(true);
+    }
+    setTokenDispensedLoad(false);
+  };
+
+  const TokenGeneration = async () => {
     setTokenLoad(true);
     const status = await generateToken(email);
-    if(status.success){
+    if (status.success) {
       setToken(status.token);
       setTime(status.time);
-    }else if(status.err){
-      alert("Unknown error occured.. Refresh your page !!")
+    } else if (status.err) {
+      alert("Unknown error occured.. Refresh your page !!");
     }
     setTokenLoad(false);
-  }
+  };
 
   return (
     <div className="flex flex-col flex-1 justify-center items-center p-4">
@@ -55,10 +72,16 @@ useEffect(()=>{
         </div>
         <div className="w-full h-40 flex justify-center items-center text-4xl font-bold text-black bg-secondary">
           {!tokenLoad ? (
-            token ? <h1>{token}</h1> :
-            <button onClick={TokenGeneration} className="text-5xl text-red-200">
-              TAP HERE
-            </button>
+            token ? (
+              <h1>{token}</h1>
+            ) : (
+              <button
+                onClick={TokenGeneration}
+                className="text-5xl text-red-200"
+              >
+                TAP HERE
+              </button>
+            )
           ) : (
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -88,9 +111,41 @@ useEffect(()=>{
           <h2>{time}</h2>
         </div>
       </div>
+      <div className="mt-8">
+        {token ? (
+          tokenDispensedLoad ? (
+            <span>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="icon icon-tabler icon-tabler-loader-2 animate-spin"
+                width={24}
+                height={24}
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                fill="none"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M12 3a9 9 0 1 0 9 9" />
+              </svg>
+            </span>
+          ) : tokenDispensed ? (
+            <div className="flex flex-col items-center text-green-600">
+              <span>This token have been dispensed &#x2714;</span>
+              <span>Come back tomorrow ...</span>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center text-red-600">
+              <span>Token not yet dispensed ❌</span>
+              <span>Token will expire at 4:00 PM !!!</span>
+            </div>
+          )
+        ) : null}
+      </div>
     </div>
   );
-}
-
+};
 
 export default page;

@@ -234,11 +234,8 @@ export const generateToken = async (email) => {
   if (checkToken.data) {
 
     try {
-      // temporary 
-      // const studentData = await getData(email);
       studentData = checkToken.data;
       const tokenNumber = Math.floor(100000 + Math.random() * 900000);
-      console.log(tokenNumber);
 
       const tokenDocRef = doc(db, "tokens", tokenNumber.toString());
       const docSnap = await getDoc(tokenDocRef);
@@ -281,6 +278,29 @@ export const generateToken = async (email) => {
   }
   return status;
 };
+
+//check if the token has been dispensed
+export const isTokenCollected = async(tokenNumber) =>{
+  console.log("Token: "+tokenNumber);
+  let status = {
+    tokenCollected: false,
+    err: null,
+  };
+  try{
+    const tokenRef = doc(db, "tokens", tokenNumber.toString());
+    const docSnap = await getDoc(tokenRef);
+    if(docSnap.exists()){
+      const isCollected = docSnap.data().isCollected;
+      if(isCollected){
+        status.tokenCollected = true;
+      }
+    }
+  }catch(err){
+    alert("Unknown error!! Refresh your page");
+    console.log(err.message);
+  }
+  return status;
+}
 
 // Gets the token generation history of that particular student
 export const getStudentTokenHistory = async (email) => {
