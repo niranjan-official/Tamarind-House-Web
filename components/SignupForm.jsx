@@ -100,7 +100,7 @@ const SignupForm = () => {
     <div className="flex w-full mt-8 flex-col items-center">
       <form ref={form} onSubmit={handleSubmit} className="flex flex-col items-center">
         {inputs.map((input, key) => (
-          <div key={key} className="input">
+          <div key={key} className="input mb-4">
             <input
               type={input.type}
               name={input.name}

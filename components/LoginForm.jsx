@@ -56,7 +56,7 @@ const LoginForm = () => {
         onSubmit={handleSubmit}
         className="flex flex-col items-center"
       >
-        <div className="input flex justify-between">
+        <div className="input flex justify-between mb-5">
           <input
             type="text"
             name="email"
@@ -66,7 +66,7 @@ const LoginForm = () => {
             required
           />
         </div>
-        <div className="input flex justify-between">
+        <div className="input flex justify-between mb-2">
           <input
             type={showPassword ? "text" : "password"}
             name="password"
@@ -113,6 +113,9 @@ const LoginForm = () => {
               </svg>
             )}
           </button>
+        </div>
+        <div className="w-full flex justify-end">
+          <Link className="text-primary text-sm" href={'/forgotpassword'}>forgot password ?</Link>
         </div>
    
         <input name="otp" value="1234" type="number" readOnly hidden />

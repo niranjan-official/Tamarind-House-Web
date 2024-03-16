@@ -8,6 +8,7 @@ import {
 import { auth, db } from "../firebase/config";
 import {
   createUserWithEmailAndPassword,
+  sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import emailjs from "@emailjs/browser";

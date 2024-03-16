@@ -3,7 +3,7 @@
 @tailwind utilities;
  
 .input{
-    @apply w-full border-b mb-5 border-gray-500 hover:border-b-2 hover:border-red-900
+    @apply w-full border-b border-gray-500 hover:border-b-2 hover:border-red-900
 }
 .input input{
     @apply w-full bg-transparent p-1 focus:outline-none focus:ring-0 
