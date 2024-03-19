@@ -17,7 +17,6 @@ const LoginForm = () => {
   const form = useRef();
 
   const handleChange = (e) => {
-    console.log(e.target);
     const { value, name } = e.target;
     setData({
       ...data,
@@ -28,15 +27,31 @@ const LoginForm = () => {
     e.preventDefault();
     setLoad(true);
     const status = await handleLogin(data.email, form.current);
+    const EmailData = {
+      email: data.email,
+      otp: status.otp
+    }
     if (status.success) {
-      const otpData = {
-        method: "login",
-        otp: status.otp,
-        email: data.email,
-        password: data.password,
-      };
-      localStorage.setItem("otp", JSON.stringify(otpData));
-      router.push("/otp");
+      const response = await fetch('/api/send',{
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(EmailData)
+      })
+      if(response.status === 200){
+        const otpData = {
+          method: "login",
+          otp: status.otp,
+          email: data.email,
+          password: data.password,
+        };
+        localStorage.setItem("otp", JSON.stringify(otpData));
+        router.push("/otp");
+      }else{
+        setLoad(false);
+        setState("Unknown error occured !!");
+      }
     } else if (status.notValid) {
       setLoad(false);
       setState("Not a valid Email");
@@ -125,7 +140,7 @@ const LoginForm = () => {
           className="flex items-center justify-center gap-2 rounded-3xl py-2 button mt-4 w-40"
           disabled={load}
         >
-          LOGIN
+          LOGIN                      
           {load && (
             <Image
               src={"/images/loading.png"}

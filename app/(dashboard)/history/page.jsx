@@ -26,7 +26,6 @@ const History = () => {
   const fetchHistory =async()=>{
     const data = await getStudentTokenHistory(email);
     if(data){
-      console.log("Data: ",data);
       setStudentHistory(data);
     }else{
       setEmpty(true);

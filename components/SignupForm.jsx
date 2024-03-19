@@ -20,7 +20,6 @@ const SignupForm = () => {
   const form = useRef();
 
   const handleChange = (e) => {
-    console.log(e.target);
     const { value, name } = e.target;
     setData({
       ...data,
@@ -37,16 +36,32 @@ const SignupForm = () => {
         form.current
       );
       if (status.success) {
-        const otpData = {
-          method: "signup",
-          otp: status.otp,
-          username: data.username,
+        const EmailData = {
           email: data.email,
-          password: data.password,
-          studentID: data.id
-        };
-        localStorage.setItem("otp", JSON.stringify(otpData));
-        router.push("/otp");
+          otp: status.otp
+        }
+        const response = await fetch('/api/send',{
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(EmailData)
+        })
+        if(response.status === 200){
+          const otpData = {
+            method: "signup",
+            otp: status.otp,
+            username: data.username,
+            email: data.email,
+            password: data.password,
+            studentID: data.id
+          };
+          localStorage.setItem("otp", JSON.stringify(otpData));
+          router.push("/otp");
+        }else{
+          setLoad(false);
+          setState("Unknown error occured !!");
+        }
       } else if (status.notValid) {
         setLoad(false);
         setState("Not a valid student");

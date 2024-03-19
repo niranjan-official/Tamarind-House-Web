@@ -1,5 +1,5 @@
 "use client";
-import { Login, Signup } from "@/Functions/functions";
+import { Login, Signup, generateOTP } from "@/Functions/functions";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
@@ -7,20 +7,24 @@ import React, { useEffect, useRef, useState } from "react";
 const numberOfDigits = 4;
 
 const OTP = () => {
-
   const Router = useRouter();
   const [otp, setOtp] = useState(new Array(numberOfDigits).fill(""));
   const [otpError, setOtpError] = useState(null);
   const [correctOTP, setCorrectOTP] = useState("");
   const [otpEmail, setOtpEmail] = useState("");
-  const [load,setLoad] = useState(false)
+  const [otpCacheData, setOtpCacheData] = useState({});
+  const [load, setLoad] = useState(false);
   const otpBoxReference = useRef([]);
+
+  const Ref = useRef(null);
+  const [timer, setTimer] = useState("");
+  const [resendState, setResendStatus] = useState(false);
 
   useEffect(() => {
     const fetchOtp = localStorage.getItem("otp");
     if (fetchOtp) {
       const data = JSON.parse(fetchOtp);
-      console.log(data);
+      setOtpCacheData(data);
       setCorrectOTP(data.otp);
       setOtpEmail(data.email);
     } else {
@@ -49,29 +53,97 @@ const OTP = () => {
 
   const handleSubmit = async () => {
     setLoad(true);
-    
-    console.log("correct:", correctOTP);
-    console.log("otp:", otp.join(""));
     if (correctOTP == otp.join("")) {
       const userData = JSON.parse(localStorage.getItem("otp"));
       let status;
-      if(userData.method === "signup"){
+      if (userData.method === "signup") {
         status = await Signup(userData);
-      }else{
-        status = await Login(userData.email,userData.password);
+      } else {
+        status = await Login(userData.email, userData.password);
       }
-      if(status.success){
-        localStorage.setItem("studentEmail",JSON.stringify(userData.email));
+      if (status.success) {
+        localStorage.setItem("studentEmail", JSON.stringify(userData.email));
         localStorage.removeItem("otp");
         Router.push("/home");
       }
     } else {
       setOtpError("❌ Wrong OTP Please Check Again");
-      setLoad(false)
+      setLoad(false);
     }
     setTimeout(() => {
       setOtpError(null);
     }, 3000);
+  };
+  const otpResend = async () => {
+    clearTimer(getDeadTime());
+    const EmailData = {
+      email: otpEmail,
+      otp: generateOTP(),
+    };
+    const response = await fetch("/api/send", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(EmailData),
+    });
+    if (response.status === 200) {
+      const otpData = {
+        method: otpCacheData.method,
+        otp: EmailData.otp,
+        email: otpEmail,
+        password: otpCacheData.password,
+        username: otpCacheData.username,
+      };
+      localStorage.setItem("otp", JSON.stringify(otpData));
+      setCorrectOTP(EmailData.otp);
+      setOtpError("New OTP has been sent");
+    } else {
+      setOtpError("Resend unsuccessful !");
+    }
+    setTimeout(() => {
+      setOtpError(null);
+    }, 3000);
+  };
+
+  const getTimeRemaining = (e) => {
+    const total = Date.parse(e) - Date.parse(new Date());
+    const seconds = Math.floor((total / 1000) % 60);
+    const minutes = Math.floor((total / 1000 / 60) % 60);
+    return {
+      total,
+      minutes,
+      seconds,
+    };
+  };
+  const clearTimer = (e) => {
+    setResendStatus(true);
+    setTimer("1:00");
+    if (Ref.current) clearInterval(Ref.current);
+    const id = setInterval(() => {
+      startTimer(e);
+    }, 1000);
+    Ref.current = id;
+  };
+
+  const startTimer = (e) => {
+    let { total, minutes, seconds } = getTimeRemaining(e);
+    if (total >= 0) {
+      setTimer(
+        (minutes > 9 ? minutes : "0" + minutes) +
+          ":" +
+          (seconds > 9 ? seconds : "0" + seconds)
+      );
+      if (total == 0) {
+        setTimer(null);
+        setResendStatus(false);
+      }
+    }
+  };
+  const getDeadTime = () => {
+    let deadline = new Date();
+    deadline.setSeconds(deadline.getSeconds() + 60);
+    return deadline;
   };
 
   return (
@@ -108,12 +180,21 @@ const OTP = () => {
       </div>
       <p className="mt-10">
         Didn't receive OTP?{" "}
-        <span className="text-primary font-bold">RESEND</span>{" "}
-      </p>
-      {otpError && <p className="mt-5">{otpError}</p>}
-      <div className="fixed flex items-center bottom-0 w-full h-20 p-4 border-t-2">
         <button
-        disabled={load}
+          disabled={resendState}
+          onClick={otpResend}
+          className="text-primary disabled:text-zinc-400 font-bold"
+        >
+          RESEND
+        </button>{" "}
+      </p>
+      {resendState && (
+        <p className="text-gray-500 text-sm mt-2">Resend in {timer}</p>
+      )}
+      {otpError && <p className="mt-5">{otpError}</p>}
+      <div className="fixed bg-secondary flex items-center bottom-0 w-full h-20 p-4 border-t-2">
+        <button
+          disabled={load}
           onClick={handleSubmit}
           className="w-full button rounded-xl py-3"
         >

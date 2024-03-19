@@ -35,8 +35,6 @@ const Profile = () => {
     if (data) {
       const date = convertTime(data.dateOfReg);
       const newDate = new Date(date);
-      console.log("Date: ", data.dateOfReg);
-      console.log(newDate);
       setData({
         name: data.name,
         id: data.id,

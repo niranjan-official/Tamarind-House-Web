@@ -1,24 +1,13 @@
-import {
-  doc,
-  getDoc,
-  setDoc,
-  updateDoc,
-  writeBatch,
-} from "firebase/firestore";
+import { doc, getDoc, updateDoc, writeBatch } from "firebase/firestore";
 import { auth, db } from "../firebase/config";
 import {
   createUserWithEmailAndPassword,
-  sendPasswordResetEmail,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import emailjs from "@emailjs/browser";
 
 // checks whether the student is a hosteler or not and sends the otp for verification
-export const handleSignup = async (
-  studentID,
-  email,
-  form
-) => {
+export const handleSignup = async (studentID, email, form) => {
   let status = {
     success: false,
     otp: null,
@@ -32,22 +21,9 @@ export const handleSignup = async (
 
     if (docSnap.exists()) {
       const existingId = docSnap.data().id;
-      console.log(docSnap.data().id);
       if (existingId === studentID) {
-        const send = await sendEmail(form);
-        if (send.success) {
-          // await updateDoc(docRef,{
-          //   name: username,
-          //   id: studentID,
-          //   email: email,
-          //   dateOfReg: new Date(),
-          // });
-          status.otp = send.otp;
+          status.otp = generateOTP()
           status.success = true;
-        } else {
-          status.err = send.error;
-          console.log(send.err);
-        }
       } else {
         status.notValid = true;
       }
@@ -75,9 +51,8 @@ export const Signup = async (userData) => {
       userData.password
     );
     const washingtonRef = doc(db, "users", userData.email);
-    await updateDoc(washingtonRef,{
+    await updateDoc(washingtonRef, {
       name: userData.username,
-      id: userData.studentID,
       email: userData.email,
       dateOfReg: new Date(),
     });
@@ -91,11 +66,11 @@ export const Signup = async (userData) => {
 };
 
 // check whether the student exist and sends otp for verification
-export const handleLogin = async (email, form) => {
-  console.log(form);
+export const handleLogin = async (email) => {
   const status = {
     success: false,
     otp: null,
+    username: null,
     err: null,
     notValid: false,
   };
@@ -104,11 +79,11 @@ export const handleLogin = async (email, form) => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-      const send = await sendEmail(form);
-      if (send.success) {
-        status.otp = send.otp;
+        const otp = generateOTP();
+        status.otp = otp;
         status.success = true;
-      }
+        status.username = docSnap.data().name;
+
     } else {
       status.notValid = true;
     }
@@ -126,11 +101,7 @@ export const Login = async (email, password) => {
     err: null,
   };
   try {
-    await signInWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
+    await signInWithEmailAndPassword(auth, email, password);
     status.success = true;
   } catch (error) {
     status.err = error.message;
@@ -141,7 +112,6 @@ export const Login = async (email, password) => {
 
 // Sends otp to the student via email
 const sendEmail = async (form) => {
-
   let status = {
     success: false,
     otp: null,
@@ -158,7 +128,6 @@ const sendEmail = async (form) => {
     .then(
       () => {
         console.log("SUCCESS!");
-        console.log("Your OTP:", otp);
         status.success = true;
         status.otp = otp;
       },
@@ -171,7 +140,7 @@ const sendEmail = async (form) => {
 };
 
 // Generates OTP for both login and signup
-const generateOTP = () => {
+export const generateOTP = () => {
   let randomNumber = "";
   for (let i = 0; i < 4; i++) {
     randomNumber += Math.floor(Math.random() * 10);
@@ -201,11 +170,6 @@ export const checkTokenExistence = async (email) => {
     }
     if (timeChange) {
       status.data = studentData;
-      console.log(
-        "generatedTime: ",
-        studentData.tokenTime + " Current: ",
-        currentDate
-      );
     } else {
       const newTime = convertTime(studentData.tokenTime);
       status.tokenExist = true;
@@ -219,7 +183,7 @@ export const checkTokenExistence = async (email) => {
   return status;
 };
 
-// Generates token for the user 
+// Generates token for the user
 export const generateToken = async (email) => {
   let studentData;
   let status = {
@@ -233,7 +197,6 @@ export const generateToken = async (email) => {
   const checkToken = await checkTokenExistence(email);
 
   if (checkToken.data) {
-
     try {
       studentData = checkToken.data;
       const tokenNumber = Math.floor(100000 + Math.random() * 900000);
@@ -255,7 +218,7 @@ export const generateToken = async (email) => {
           generationTime: time,
           isCollected: false,
           date: formatDate(date),
-          gender: studentData.gender
+          gender: studentData.gender,
         });
 
         const studentRef = doc(db, "users", email);
@@ -281,45 +244,43 @@ export const generateToken = async (email) => {
 };
 
 //check if the token has been dispensed
-export const isTokenCollected = async(tokenNumber) =>{
-  console.log("Token: "+tokenNumber);
+export const isTokenCollected = async (tokenNumber) => {
   let status = {
     tokenCollected: false,
     err: null,
   };
-  try{
+  try {
     const tokenRef = doc(db, "tokens", tokenNumber.toString());
     const docSnap = await getDoc(tokenRef);
-    if(docSnap.exists()){
+    if (docSnap.exists()) {
       const isCollected = docSnap.data().isCollected;
-      if(isCollected){
+      if (isCollected) {
         status.tokenCollected = true;
       }
     }
-  }catch(err){
+  } catch (err) {
     alert("Unknown error!! Refresh your page");
     console.log(err.message);
   }
   return status;
-}
+};
 
 // Gets the token generation history of that particular student
 export const getStudentTokenHistory = async (email) => {
   const userData = await getData(email);
   let data;
-  let studentHistory =  [];
+  let studentHistory = [];
   try {
     const docRef = doc(db, "user-history", userData.id);
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
       data = docSnap.data();
-      console.log(data);
     } else {
       console.log("No such document!");
     }
     Object.entries(data).forEach(([key, value]) => {
-        studentHistory.push({key,value})
+      studentHistory.push({ key, value });
     });
     return studentHistory;
   } catch (err) {
@@ -340,7 +301,7 @@ export const getData = async (email) => {
         dateOfReg: docSnap.data().dateOfReg,
         token: docSnap.data().token,
         tokenTime: docSnap.data().tokenTime,
-        gender: docSnap.data().gender
+        gender: docSnap.data().gender,
       };
       return data;
     } else {
@@ -361,9 +322,7 @@ export const convertTime = (time) => {
 
 // Gets the time from the js date object
 export const getTimeFromDate = (date) => {
-  console.log("New Date:1 ", date);
   const newDate = new Date(date);
-  console.log("New Date:2 ", newDate);
   const hours = newDate.getHours();
   const minutes = newDate.getMinutes();
 
@@ -380,7 +339,6 @@ export const getTimeFromDate = (date) => {
 function isDateGreaterThan(date1, date2) {
   var d1 = new Date(date1);
   var d2 = new Date(date2);
-  console.log("Dates: ", d1, d2);
 
   d1.setHours(0, 0, 0, 0);
   d2.setHours(0, 0, 0, 0);
@@ -390,7 +348,6 @@ function isDateGreaterThan(date1, date2) {
 
 // Generate the date from the js date object
 export const formatDate = (date) => {
-
   var day = date.getDate();
   var month = date.getMonth() + 1;
   var year = date.getFullYear();

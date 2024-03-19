@@ -30,9 +30,7 @@ const page = () => {
   }, [email]);
 
   const checkToken = async (email) => {
-    console.log(email);
     const status = await checkTokenExistence(email);
-    console.log("checkToken: ", status);
     if (status.tokenExist) {
       setTokenDispensedLoad(true);
       tokenCollectionStatus(status.token);
