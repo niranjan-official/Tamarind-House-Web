@@ -6,6 +6,7 @@ import {
   isTimeBetween10AMAnd3PM,
   isTokenCollected,
 } from "@/Functions/functions";
+import Image from "next/image";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 
 const page = () => {
@@ -97,7 +98,9 @@ const page = () => {
                 </button>
               )
             ) : (
-              <h1>Closed</h1>
+              <div className="w-full h-full flex justify-center items-center p-2 pl-4">
+                <Image src={'/images/closed.png'} width={200} height={200} style={{height:'auto',width: '100%'}}/>
+              </div>
             )
           ) : (
             <svg
@@ -157,7 +160,7 @@ const page = () => {
           ) : (
             <div className="flex flex-col items-center text-red-600">
               <span>Token not yet dispensed ❌</span>
-              <span>Token will expire at 4:00 PM !!!</span>
+              <span>Token will expire at 3:00 PM !!!</span>
             </div>
           )
         ) : null

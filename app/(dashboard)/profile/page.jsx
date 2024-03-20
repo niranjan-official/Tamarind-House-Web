@@ -5,6 +5,7 @@ import Loading from "../loading";
 import { useRouter } from "next/navigation";
 import { auth } from "@/firebase/config";
 import { signOut } from "firebase/auth";
+import Link from "next/link";
 
 const Profile = () => {
 
@@ -57,9 +58,8 @@ const Profile = () => {
   }
   if (!load) {
     return (
-      <div className="w-full flex flex-col flex-1">
-        <div className="w-full h-1/3 flex justify-center bg-primary rounded-b-[50%]">
-          <div className="relative -bottom-1/2 h-24 w-24 flex justify-center items-center rounded-full bg-white shadow-md p-6">
+      <div className="w-full flex flex-col flex-1 items-center overflow-y-scroll">
+          <div className="h-24 w-24 my-10 flex justify-center items-center rounded-full bg-white shadow-md p-6">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               viewBox="0 0 24 24"
@@ -73,8 +73,8 @@ const Profile = () => {
               />
             </svg>
           </div>
-        </div>
-        <div className="w-full h-full mt-12 overflow-y-scroll pb-5">
+      
+        <div className="w-full h-full pb-5">
           <div className="w-full p-6 pr-0 flex items-center gap-8">
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -170,6 +170,9 @@ const Profile = () => {
             </button>
           </div>
         </div>
+          <div className="w-full flex justify-end pr-4 pb-1">
+            <Link href={'/credits'} className="text-primary underline">credits</Link>
+          </div>
       </div>
     );
   } else {

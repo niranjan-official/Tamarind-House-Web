@@ -28,52 +28,57 @@ const SignupForm = () => {
   };
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if(data.password === data.confirm){
-      setLoad(true);
-      const status = await handleSignup(
-        data.id,
-        data.email,
-        form.current
-      );
-      if (status.success) {
-        const EmailData = {
-          email: data.email,
-          otp: status.otp
-        }
-        const response = await fetch('/api/send',{
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(EmailData)
-        })
-        if(response.status === 200){
-          const otpData = {
-            method: "signup",
-            otp: status.otp,
-            username: data.username,
+    if(data.password.length > 5){
+      if(data.password === data.confirm){
+        setLoad(true);
+        const upperCaseId = data.id.toUpperCase().trim();
+        const status = await handleSignup(
+          upperCaseId,
+          data.email,
+          form.current
+        );
+        if (status.success) {
+          const EmailData = {
             email: data.email,
-            password: data.password,
-            studentID: data.id
-          };
-          localStorage.setItem("otp", JSON.stringify(otpData));
-          router.push("/otp");
-        }else{
+            otp: status.otp
+          }
+          const response = await fetch('/api/send',{
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(EmailData)
+          })
+          if(response.status === 200){
+            const otpData = {
+              method: "signup",
+              otp: status.otp,
+              username: data.username,
+              email: data.email,
+              password: data.password,
+              studentID: upperCaseId
+            };
+            localStorage.setItem("otp", JSON.stringify(otpData));
+            router.push("/otp");
+          }else{
+            setLoad(false);
+            setState("Unknown error occured !!");
+          }
+        } else if (status.notValid) {
+          setLoad(false);
+          setState("Not a valid student");
+        } else if (status.notValidEmail) {
+          setLoad(false);
+          setState("Not a valid email address");
+        } else {
           setLoad(false);
           setState("Unknown error occured !!");
         }
-      } else if (status.notValid) {
-        setLoad(false);
-        setState("Not a valid student");
-      } else if (status.notValidEmail) {
-        setLoad(false);
-        setState("Not a valid email address");
-      } else {
-        setLoad(false);
-        setState("Unknown error occured !!");
+      }else{
+        setState("Passwords mismatching ??")
       }
     }else{
-      setState("Passwords mismatching ??")
+      setState("Min 6 characters required for password")
     }
     setTimeout(() => {
       setState("");

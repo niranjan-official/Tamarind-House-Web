@@ -1,3 +1,4 @@
+import CreditsLink from '@/components/CreditsLink'
 import LoginForm from '@/components/LoginForm'
 import Image from 'next/image'
 import React from 'react'
@@ -10,10 +11,11 @@ const Login = () => {
         <Image height={300} width={300} src="/images/Rectangle.svg" alt='rectangle'/>
       </div>
       <div className='flex flex-col flex-1 items-center justify-center px-14 z-10'>
-        <Image src="/images/prc-logo.svg" height={150} width={150} alt='prc-logo'/>
+        <Image src="/images/prc-official.png" height={200} width={200} alt='prc-logo'/>
         <h1 className='text-5xl font-bold mt-4'>LOGIN</h1>
-        <LoginForm/>
+        <LoginForm/> 
       </div>
+      <CreditsLink/>
     </div>
   )
 }
