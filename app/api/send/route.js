@@ -10,8 +10,8 @@ export async function POST(request) {
       port: 587,
       secure: false,
       auth: {
-        user: "niranjansabarinath1521@gmail.com",
-        pass: "7ChzLck8HIpd36Ew",
+        user: process.env.BREVO_USERNAME,
+        pass: process.env.BREVO_PASSWORD,
       },
     });
 

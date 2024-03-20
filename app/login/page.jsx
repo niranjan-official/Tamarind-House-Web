@@ -3,6 +3,7 @@ import Image from 'next/image'
 import React from 'react'
 
 const Login = () => {
+
   return (
     <div className='flex min-h-screen flex-col bg-secondary'>
       <div className='absolute top-0 left-0 z-0'>

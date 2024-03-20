@@ -22,8 +22,8 @@ export const handleSignup = async (studentID, email, form) => {
     if (docSnap.exists()) {
       const existingId = docSnap.data().id;
       if (existingId === studentID) {
-          status.otp = generateOTP()
-          status.success = true;
+        status.otp = generateOTP();
+        status.success = true;
       } else {
         status.notValid = true;
       }
@@ -79,11 +79,10 @@ export const handleLogin = async (email) => {
     const docSnap = await getDoc(docRef);
 
     if (docSnap.exists()) {
-        const otp = generateOTP();
-        status.otp = otp;
-        status.success = true;
-        status.username = docSnap.data().name;
-
+      const otp = generateOTP();
+      status.otp = otp;
+      status.success = true;
+      status.username = docSnap.data().name;
     } else {
       status.notValid = true;
     }
@@ -311,6 +310,28 @@ export const getData = async (email) => {
     alert(err.message);
   }
 };
+
+export const getServerDate = async () => {
+  const response = await fetch("/api/date");
+  const date = await response.json();
+  const serverTime = new Date(date);
+  const istTime = serverTime.toLocaleString("en-US", {
+    timeZone: "Asia/Kolkata",
+  });
+  console.log("ServerTime: ", istTime);
+  return istTime;
+};
+
+export function isTimeBetween10AMAnd3PM(inputDateString) {
+  // Parse the input date string into a Date object
+  const date = new Date(inputDateString);
+
+  // Extract the hour component
+  const hour = date.getHours();
+
+  // Check if the hour is between 10AM (10) and 3PM (15)
+  return hour >= 10 && hour < 15;
+}
 
 // converts the date from firebase to normal format
 export const convertTime = (time) => {

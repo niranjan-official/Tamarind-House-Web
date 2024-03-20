@@ -2,15 +2,30 @@
 import {
   checkTokenExistence,
   generateToken,
+  getServerDate,
+  isTimeBetween10AMAnd3PM,
   isTokenCollected,
 } from "@/Functions/functions";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 
 const page = () => {
+
+  useEffect(()=>{
+    getDate()
+  },[])
+  const getDate = async() =>{
+    const currentTime = await getServerDate();
+    const checkTime = isTimeBetween10AMAnd3PM(currentTime);
+    if(checkTime){
+      setIsValidTime(true);
+    }
+    console.log("Time Check: "+checkTime);
+  }
   const [email, setEmail] = useState("");
 
   const [token, setToken] = useState("");
   const [tokenLoad, setTokenLoad] = useState(true);
+  const [isValidTime, setIsValidTime] = useState(false);
   const [time, setTime] = useState("");
 
   const [tokenDispensed, setTokenDispensed] = useState(false);
@@ -70,15 +85,19 @@ const page = () => {
         </div>
         <div className="w-full h-40 flex justify-center items-center text-4xl font-bold text-black bg-secondary">
           {!tokenLoad ? (
-            token ? (
-              <h1>{token}</h1>
+            isValidTime ? (
+              token ? (
+                <h1>{token}</h1>
+              ) : (
+                <button
+                  onClick={TokenGeneration}
+                  className="text-5xl text-red-200"
+                >
+                  TAP HERE
+                </button>
+              )
             ) : (
-              <button
-                onClick={TokenGeneration}
-                className="text-5xl text-red-200"
-              >
-                TAP HERE
-              </button>
+              <h1>Closed</h1>
             )
           ) : (
             <svg
@@ -106,11 +125,12 @@ const page = () => {
           )}
         </div>
         <div className="h-14 flex justify-center items-center text-white text-xl">
-          <h2>{time}</h2>
+          <h2>{isValidTime ? time : null}</h2>
         </div>
       </div>
       <div className="mt-8">
-        {token ? (
+        {isValidTime ? (
+        token ? (
           tokenDispensedLoad ? (
             <span>
               <svg
@@ -140,6 +160,7 @@ const page = () => {
               <span>Token will expire at 4:00 PM !!!</span>
             </div>
           )
+        ) : null
         ) : null}
       </div>
     </div>
