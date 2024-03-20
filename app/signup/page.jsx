@@ -9,7 +9,7 @@ const Signup = () => {
       <div className='absolute top-0 left-0 z-0'>
         <Image height={300} width={300} src="/images/Rectangle.svg" alt='rectangle'/>
       </div>
-      <div className='flex flex-col flex-1 items-center pt-16 justify-center px-14 z-10'>
+      <div className='flex flex-col flex-1 items-center pt-14 justify-center px-14 z-10'>
         <Image src="/images/prc-official.png" height={200} width={200} alt='prc-logo'/>
         <h1 className='text-5xl font-bold mt-4'>SIGNUP</h1>
         <SignupForm/>
