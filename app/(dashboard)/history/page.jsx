@@ -41,7 +41,7 @@ const History = () => {
             studentHistory ? 
             studentHistory.map((obj,key)=>{
               return(
-                <HistoryCard key={key} tokenNumber={obj.key} dispenseTime={obj.value.dispenseTime} generationTime={obj.value.timestamp} date={'01-12-24'}/>
+                <HistoryCard key={key} tokenNumber={obj.key} dispenseTime={obj.value.Printing_time} generationTime={obj.value.generationTime} date={obj.value.date}/>
               )
             }) : null
           }
