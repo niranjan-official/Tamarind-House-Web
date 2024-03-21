@@ -1,7 +1,6 @@
 {
   "name": "Tamarind House",
-  "short_name": "PRC-TH",
-
+  "short_name": "Canteen",
   "icons": [
     {
       "src": "windows11/SmallTile.scale-100.png",
