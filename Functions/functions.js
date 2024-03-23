@@ -312,7 +312,7 @@ export const getData = async (email) => {
 };
 
 export const getServerDate = async () => {
-  const response = await fetch("/api/date", { cache: 'no-store' });
+  const response = await fetch("/api/date");
   const date = await response.json();
   const serverTime = new Date(date);
   const istTime = serverTime.toLocaleString("en-US", {
