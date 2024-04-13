@@ -10,7 +10,7 @@ import Image from "next/image";
 import React, { useEffect, useLayoutEffect, useState } from "react";
 
 const page = () => {
-
+  
   useEffect(()=>{
     getDate()
   },[])
@@ -99,7 +99,7 @@ const page = () => {
               )
             ) : (
               <div className="w-full h-full flex justify-center items-center p-2 pl-4">
-                <Image src={'/images/closed.png'} width={200} height={200} style={{height:'auto',width: '100%'}}/>
+                <h1>CLOSED</h1>
               </div>
             )
           ) : (
@@ -131,7 +131,7 @@ const page = () => {
           <h2>{isValidTime ? time : null}</h2>
         </div>
       </div>
-      <div className="mt-8">
+      <div className={`mt-8 p-2 rounded-md ${(token && !tokenLoad) && "bg-slate-50"}`}>
         {isValidTime ? (
         token ? (
           tokenDispensedLoad ? (
@@ -164,7 +164,8 @@ const page = () => {
             </div>
           )
         ) : null
-        ) : null}
+        ) : 
+        !tokenLoad && ((<h1 className="">Active Time : 10 AM - 3 PM</h1>))}
       </div>
     </div>
   );

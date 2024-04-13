@@ -103,8 +103,8 @@ export const Login = async (email, password) => {
     await signInWithEmailAndPassword(auth, email, password);
     status.success = true;
   } catch (error) {
-    status.err = error.message;
-    console.log(error.message);
+    status.err = {message: error.message, code: error.code};
+    console.log(error);
   }
   return status;
 };

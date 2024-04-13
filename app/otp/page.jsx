@@ -55,12 +55,12 @@ const OTP = () => {
     setLoad(true);
     if (correctOTP == otp.join("")) {
       const userData = JSON.parse(localStorage.getItem("otp"));
-      let status;
-      if (userData.method === "signup") {
-        status = await Signup(userData);
-      } else {
-        status = await Login(userData.email, userData.password);
-      }
+      const status = await Signup(userData);
+      // if (userData.method === "signup") {
+      //   status = await Signup(userData);
+      // } else {
+      //   status = await Login(userData.email, userData.password);
+      // }
       if (status.success) {
         localStorage.setItem("studentEmail", JSON.stringify(userData.email));
         localStorage.removeItem("otp");
