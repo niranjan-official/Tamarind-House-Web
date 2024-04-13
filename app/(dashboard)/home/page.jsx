@@ -80,11 +80,11 @@ const page = () => {
 
   return (
     <div className="flex flex-col flex-1 justify-center items-center p-4">
-      <div className="w-44 flex flex-col bg-primary rounded-3xl px-2 justify-evenly">
+      <div className="w-44 flex flex-col bg-primary rounded-3xl px-2 justify-evenly shadow-md shadow-gray-500">
         <div className="h-14 flex justify-center items-center">
           <h2 className="text-secondary text-2xl">TOKEN NO :</h2>
         </div>
-        <div className="w-full h-40 flex justify-center items-center text-4xl font-bold text-black bg-secondary">
+        <div className="w-full h-40 flex justify-center items-center text-4xl font-bold text-black bg-secondary shadow-inner shadow-gray-950">
           {!tokenLoad ? (
             isValidTime ? (
               token ? (
