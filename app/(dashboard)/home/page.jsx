@@ -131,7 +131,7 @@ const page = () => {
           <h2>{isValidTime ? time : null}</h2>
         </div>
       </div>
-      <div className={`mt-8 p-2 rounded-md ${(token && !tokenLoad) && "bg-slate-50"}`}>
+      <div className={`mt-8 p-2 rounded-md ${((token || !isValidTime) && !tokenLoad) && "bg-slate-50"}`}>
         {isValidTime ? (
         token ? (
           tokenDispensedLoad ? (
