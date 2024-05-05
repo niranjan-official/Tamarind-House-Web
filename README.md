@@ -1,36 +1,31 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Token Dispension System
+
+Welcome to the Token Dispension System, a dynamic platform designed to streamline the process of token generation and dispensation for students. This system integrates both hardware and software components, providing a user-friendly interface for token management.
+
+## Overview
+
+The Token Dispension System combines hardware and software to facilitate the efficient generation and dispensation of tokens for students. Through the web application, users can easily generate tokens, view their dispensation history, and manage their profiles.
+
+## Features
+
+- **Next.js**: Developed using Next.js, a React framework for building dynamic web applications.
+- **Firebase**: Utilizes Firebase for database management and user authentication, ensuring secure access to the system.
+- **Brevo Email System**: Implements an email system from Brevo for OTP verification for users.
+- **Tailwind CSS**: Styled with Tailwind CSS for sleek and responsive user interface design.
+- **Progressive Web App (PWA)**: Implemented PWA to provide a native app-like experience, allowing users to install the web application on their devices, work offline.
+- **User-Friendly Dashboard**: Features a dashboard with intuitive navigation, including home page for token generation, history tab for viewing token dispensation history, and a profile page for user management.
+
+## Hosting
+
+The Token Dispension System is hosted on Vercel, providing reliable and scalable hosting solutions for dynamic web applications. With Vercel, the system benefits from seamless deployment and high-performance hosting.
 
 ## Getting Started
 
-First, run the development server:
+To deploy your own instance of the Token Dispension System, follow these steps:
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. Clone the repository.
+2. Install dependencies with `npm install`.
+3. Configure Firebase credentials for database and authentication.
+4. Set up Brevo email system for notifications (optional).
+5. Customize the styling and user interface according to your preferences.
+6. Deploy to Vercel using their CLI or GitHub integration.
