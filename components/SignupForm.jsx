@@ -31,7 +31,7 @@ const SignupForm = () => {
     if(data.password.length > 5){
       if(data.password === data.confirm){
         setLoad(true);
-        const upperCaseId = data.id.toUpperCase().trim();
+        const upperCaseId = data.id.toLowerCase().trim();
         const status = await handleSignup(
           upperCaseId,
           data.email,
