@@ -26,7 +26,7 @@ const LoginForm = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoad(true);
-    const status = await Login(data.email,data.password);
+    const status = await Login(data.email.toLowerCase().trim(),data.password.trim());
     if(status.success){
       router.push('/home');
     }else{
