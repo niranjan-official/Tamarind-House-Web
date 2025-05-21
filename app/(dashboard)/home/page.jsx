@@ -10,7 +10,6 @@ import {
 import { useEffect, useLayoutEffect, useState } from "react"
 import { Loader2, Clock, CheckCircle2, AlertCircle, CalendarClock, Utensils, Timer } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
@@ -221,7 +220,7 @@ export default function TokenPage() {
       </AnimatePresence>
 
       {/* Today's menu preview */}
-      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
+      {/* <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
         <Card className="mt-6 border-none shadow-md bg-white overflow-hidden">
           <CardContent className="p-0">
             <motion.div whileHover={{ backgroundColor: "rgba(232, 236, 215, 0.3)" }} className="p-4">
@@ -240,7 +239,7 @@ export default function TokenPage() {
             </motion.div>
           </CardContent>
         </Card>
-      </motion.div>
+      </motion.div> */}
     </motion.div>
   )
 }
@@ -569,9 +568,8 @@ function MenuItem({ name, type }) {
         <span className="text-gray-700">{name}</span>
       </div>
       <span
-        className={`text-xs px-2 py-0.5 rounded-full ${
-          type === "Veg" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
-        }`}
+        className={`text-xs px-2 py-0.5 rounded-full ${type === "Veg" ? "bg-green-50 text-green-600" : "bg-red-50 text-red-600"
+          }`}
       >
         {type}
       </span>

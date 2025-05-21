@@ -1,6 +1,6 @@
 "use client"
 
-import { getStudentTokenHistory } from "@/Functions/functions" 
+import { getStudentTokenHistory } from "@/Functions/functions"
 import HistoryCard from "@/components/HistoryCard"
 import { useEffect, useLayoutEffect, useState } from "react"
 import Loading from "../loading"

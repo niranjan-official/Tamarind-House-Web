@@ -135,20 +135,6 @@ export default function CreditsPage() {
       </motion.div>
 
       <div className="flex-1 p-4 pb-16 pt-16">
-        <div className="mb-6 mt-4">
-          <motion.div
-            variants={backButtonVariants}
-            initial="initial"
-            animate="animate"
-            whileHover="hover"
-            className="inline-block"
-          >
-            <Link href="/home" className="inline-flex items-center text-th-medium-green hover:text-th-dark-green">
-              <ArrowLeft className="h-4 w-4 mr-1" />
-              <span>Back to Home</span>
-            </Link>
-          </motion.div>
-        </div>
 
         <motion.h1
           ref={headerRef}

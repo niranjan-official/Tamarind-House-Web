@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Loader2 } from "lucide-react"
+import { HelpCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
@@ -192,11 +192,11 @@ export default function Login() {
               </motion.div>
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.7, duration: 0.4 }}>
                 <CardDescription className="text-center text-th-medium-green">
-                  Welcome to the College Canteen Token Portal
+                  Welcome to the College Canteen Token Portal of PRC
                 </CardDescription>
               </motion.div>
             </CardHeader>
-            <CardContent className="flex flex-col items-center space-y-6">
+            <CardContent className="flex flex-col items-center">
               <motion.div
                 className="w-full"
                 initial={{ opacity: 0, y: 20 }}
@@ -230,13 +230,23 @@ export default function Login() {
               </motion.div>
 
               <motion.p
-                className="text-sm text-gray-500 text-center"
+                className="text-sm text-gray-500 text-center mt-6"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.1, duration: 0.4 }}
               >
-                Only students allotted for canteen food access will be allowed.
+                Please note food tokens are exclusively for our hostel students to collect.
               </motion.p>
+              <div className="mt-4 flex items-center justify-center text-sm text-th-dark-green hover:text-th-dark-green/80 transition-colors duration-200">
+                <HelpCircle className="w-4 h-4 mr-1" />
+                <span className="mt-[0.5px]">
+                  Having trouble?{' '}
+                  <a href="mailto:tamarind.house@providence.edu.in?subject=Support%20Request" className="font-medium underline hover:no-underline">
+                    Get in touch
+                  </a>
+                </span>
+              </div>
+
             </CardContent>
           </Card>
         </motion.div>
