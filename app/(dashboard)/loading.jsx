@@ -1,12 +1,10 @@
-import Image from 'next/image'
-import React from 'react'
+import { Loader2 } from "lucide-react"
 
-const Loading = () => {
+export default function Loading() {
   return (
-    <div className='w-full flex justify-center items-center'>
-        <Image src={'/images/prc-logo.svg'} width={60} height={60} alt='loading' className='animate-pulse'/>
+    <div className="w-full h-[80vh] flex flex-col justify-center items-center gap-4">
+      <div class="loader"></div>
+      <p className="text-th-medium-green font-medium">Loading...</p>
     </div>
   )
 }
-
-export default Loading

@@ -35,42 +35,6 @@ const LoginForm = () => {
       }
       setLoad(false);
     }
-    // const status = await handleLogin(data.email, form.current);
-    // const EmailData = {
-    //   email: data.email,
-    //   otp: status.otp
-    // }
-    // if (status.success) {
-    //   const response = await fetch('/api/send',{
-    //     method: 'POST',
-    //     headers: {
-    //       'Content-Type': 'application/json'
-    //     },
-    //     body: JSON.stringify(EmailData)
-    //   })
-    //   if(response.status === 200){
-    //     const otpData = {
-    //       method: "login",
-    //       otp: status.otp,
-    //       email: data.email,
-    //       password: data.password,
-    //     };
-    //     localStorage.setItem("otp", JSON.stringify(otpData));
-    //     router.push("/otp");
-    //   }else{
-    //     setLoad(false);
-    //     setState("Unknown error occured !!");
-    //   }
-    // } else if (status.notValid) {
-    //   setLoad(false);
-    //   setState("Not a valid Email");
-    // } else {
-    //   setLoad(false);
-    //   setState("Unknown error occured !!");
-    // }
-    // setTimeout(() => {
-    //   setState("");
-    // }, 3000);
   };
  
   return (

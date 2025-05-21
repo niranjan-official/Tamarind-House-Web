@@ -1,16 +1,99 @@
-import Image from 'next/image'
-import React from 'react'
-import { Philosopher } from 'next/font/google'
-const philosopher = Philosopher({
-  weight: ['400'],
-  subsets: ['latin']
-})
-const Header = () => {
+"use client"
+
+import { useState, useEffect } from "react"
+import Image from "next/image"
+import { motion } from "framer-motion"
+import { Bell, RefreshCw } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { usePathname } from "next/navigation"
+import Link from "next/link"
+
+export default function Header() {
+  const [notifications, setNotifications] = useState(2)
+  const [scrolled, setScrolled] = useState(false)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const pathname = usePathname()
+
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 10) {
+        setScrolled(true)
+      } else {
+        setScrolled(false)
+      }
+    }
+
+    window.addEventListener("scroll", handleScroll)
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  const handleRefresh = () => {
+    setIsRefreshing(true)
+    window.location.reload()
+  }
+
   return (
-    <div className='w-full flex items-center h-20 p-4 gap-4 bg-white shadow-md fixed z-40'>
-        <Image src="/images/prc-official.png" width={50} height={50} style={{width: 'auto',height:'100%'}} alt="prc" />
-      <h1 className={`text-primary ${philosopher.className} text-3xl`}>Tamarind-House</h1>
-    </div>
+    <motion.div
+      initial={{ y: -20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+      className={`w-full fixed z-40 transition-all duration-300 ${
+        scrolled ? "bg-white/95 backdrop-blur-md shadow-md" : "bg-white shadow-sm"
+      }`}
+    >
+      <div className="max-w-screen-xl mx-auto">
+        <div className="flex items-center justify-between h-16 px-4">
+          {/* Logo and App Name */}
+          <Link href="/home">
+            <motion.div className="flex items-center gap-2" whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <div className="relative h-9 w-9 overflow-hidden">
+                <div className="absolute inset-0">
+                  <div className="h-full w-full rounded-full bg-white flex items-center justify-center">
+                    <Image src="/images/logo.png" width={40} height={40} alt="Tamarind House" />
+                  </div>
+                </div>
+              </div>
+              <div className="flex flex-col mt-1">
+                <h1 className="text-lg font-bold text-th-dark-green leading-tight">Tamarind House</h1>
+                <span className="text-[10px] text-th-medium-green leading-tight -mt-1 ml-1">Food Token System</span>
+              </div>
+            </motion.div>
+          </Link>
+
+          {/* Right side actions */}
+          <div className="flex items-center gap-1">
+            {/* Notifications */}
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="relative">
+              <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 text-th-medium-green">
+                <Bell size={20} />
+                {notifications > 0 && (
+                  <motion.span
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center"
+                  >
+                    {notifications}
+                  </motion.span>
+                )}
+              </Button>
+            </motion.div>
+
+            {/* Refresh Button */}
+            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
+              <Button
+                variant="ghost"
+                size="icon"
+                className="rounded-full h-9 w-9 text-th-medium-green"
+                onClick={handleRefresh}
+                disabled={isRefreshing}
+              >
+                <RefreshCw size={20} className={isRefreshing ? "animate-spin" : ""} />
+              </Button>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    </motion.div>
   )
 }
-export default Header;

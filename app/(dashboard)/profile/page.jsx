@@ -1,183 +1,283 @@
-"use client";
-import { convertTime, formatDate, getData } from "@/Functions/functions";
-import React, { useEffect, useLayoutEffect, useState } from "react";
-import Loading from "../loading";
-import { useRouter } from "next/navigation";
-import { auth } from "@/firebase/config";
-import { signOut } from "firebase/auth";
-import Link from "next/link";
+"use client"
 
-const Profile = () => {
+import { convertTime, formatDate, getData } from "@/Functions/functions"
+import { useEffect, useLayoutEffect, useState } from "react"
+import Loading from "../loading"
+import { useRouter } from "next/navigation"
+import { auth } from "@/firebase/config"
+import { signOut } from "firebase/auth"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import { User, BadgeIcon as IdCard, Mail, Calendar, LogOut } from "lucide-react"
+import { toast } from "sonner"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { Separator } from "@/components/ui/separator"
+import { motion, AnimatePresence } from "framer-motion"
 
-  const Router = useRouter();
-  const [email, setEmail] = useState("");
+function ProfileItem({ icon, label, value, className, delay = 0 }) {
+  return (
+    <motion.div
+      className="flex items-center p-4"
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{
+        duration: 0.4,
+        delay,
+        type: "spring",
+        stiffness: 100,
+      }}
+      whileHover={{
+        backgroundColor: "rgba(0, 0, 0, 0.02)",
+        transition: { duration: 0.2 },
+      }}
+    >
+      <motion.div
+        className="mr-3"
+        whileHover={{
+          scale: 1.1,
+          rotate: 5,
+          transition: { duration: 0.2 },
+        }}
+      >
+        {icon}
+      </motion.div>
+      <div className="flex flex-col w-full overflow-hidden">
+        <motion.span
+          className="text-xs text-gray-500"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.8 }}
+          transition={{ duration: 0.3, delay: delay + 0.1 }}
+        >
+          {label}
+        </motion.span>
+        <motion.span
+          className={`text-gray-700 truncate max-w-full ${className}`}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: delay + 0.2 }}
+        >
+          {value}
+        </motion.span>
+      </div>
+    </motion.div>
+  )
+}
+
+export default function Profile() {
+  const Router = useRouter()
+  const [email, setEmail] = useState("")
   const [data, setData] = useState({
     name: "",
     id: "",
     dateOfReg: "",
-  });
-  const [load, setLoad] = useState(true);
+  })
+  const [load, setLoad] = useState(true)
 
   useLayoutEffect(() => {
-    const userData = JSON.parse(localStorage.getItem("studentData"));
+    const userData = JSON.parse(localStorage.getItem("studentData"))
     if (userData) {
-      setEmail(userData.email);
+      setEmail(userData.email)
     }
-  }, []);
+  }, [])
 
   useEffect(() => {
     if (email) {
-      fetchData();
+      fetchData()
     }
-  }, [email]);
+  }, [email])
 
   const fetchData = async () => {
-    const data = await getData(email);
+    const data = await getData(email)
     if (data) {
-      const date = convertTime(data.dateOfReg);
-      const newDate = new Date(date);
+      const date = convertTime(data.dateOfReg)
+      const newDate = new Date(date)
       setData({
         name: data.name,
         id: data.id,
         dateOfReg: formatDate(newDate),
-      });
-      setLoad(false);
+      })
+      setLoad(false)
     } else {
-      alert("Unknown error occured !!");
-    }
-  };
-
-  const handleSignout = () =>{
-    if(confirm("Do you want to logout?")){
-      signOut(auth).then(() => {
-        Router.push("/login");
-      }).catch((error) => {
-        alert("Logout failed !! Try again");
-      });
+      toast.error("Unknown error occurred!")
     }
   }
+
+  const handleSignout = () => {
+    toast.promise(
+      new Promise((resolve, reject) => {
+        signOut(auth)
+          .then(() => {
+            setTimeout(() => {
+              Router.push("/login")
+              resolve(true)
+            }, 1000)
+          })
+          .catch((error) => {
+            reject(error)
+          })
+      }),
+      {
+        loading: "Signing out...",
+        success: "Signed out successfully!",
+        error: "Sign out failed. Please try again.",
+      },
+    )
+  }
+
+  // Animation variants
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: {
+        when: "beforeChildren",
+        staggerChildren: 0.1,
+        delayChildren: 0.2,
+      },
+    },
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.3 },
+    },
+  }
+
+  const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 24,
+      },
+    },
+  }
+
   if (!load) {
     return (
-      <div className="w-full flex flex-col flex-1 items-center overflow-y-scroll">
-          <div className="h-24 w-24 my-10 flex justify-center items-center rounded-full bg-white shadow-md p-6">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-              className="w-full h-full text-primary"
-            >
-              <path
-                fillRule="evenodd"
-                d="M7.5 6a4.5 4.5 0 1 1 9 0 4.5 4.5 0 0 1-9 0ZM3.751 20.105a8.25 8.25 0 0 1 16.498 0 .75.75 0 0 1-.437.695A18.683 18.683 0 0 1 12 22.5c-2.786 0-5.433-.608-7.812-1.7a.75.75 0 0 1-.437-.695Z"
-                clipRule="evenodd"
-              />
-            </svg>
-          </div>
-      
-        <div className="w-full h-full pb-5">
-          <div className="w-full p-6 pr-0 flex items-center gap-8">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6 text-red-950"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z"
-              />
-            </svg>
-            <h1 className="text-xl text-gray-500">{data?.name}</h1>
-          </div>
-          <hr />
-          <div className="w-full p-6 pr-0 flex items-center gap-8">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6 text-red-950"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z"
-              />
-            </svg>
-
-            <h1 className="text-xl text-gray-500">{data?.id}</h1>
-          </div>
-          <hr />
-          <div className="w-full p-6 pr-4 gap-8 flex items-center break-all">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6 text-red-950"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M21.75 6.75v10.5a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25m19.5 0v.243a2.25 2.25 0 0 1-1.07 1.916l-7.5 4.615a2.25 2.25 0 0 1-2.36 0L3.32 8.91a2.25 2.25 0 0 1-1.07-1.916V6.75"
-              />
-            </svg>
-
-            <h1 className=" text-gray-500">{email}</h1>
-          </div>
-          <hr />
-          <div className="w-full p-6 pr-0 flex items-center gap-8">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth={1.5}
-              stroke="currentColor"
-              className="w-6 h-6 text-red-950"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 0 1 2.25-2.25h13.5A2.25 2.25 0 0 1 21 7.5v11.25m-18 0A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75m-18 0v-7.5A2.25 2.25 0 0 1 5.25 9h13.5A2.25 2.25 0 0 1 21 11.25v7.5m-9-6h.008v.008H12v-.008ZM12 15h.008v.008H12V15Zm0 2.25h.008v.008H12v-.008ZM9.75 15h.008v.008H9.75V15Zm0 2.25h.008v.008H9.75v-.008ZM7.5 15h.008v.008H7.5V15Zm0 2.25h.008v.008H7.5v-.008Zm6.75-4.5h.008v.008h-.008v-.008Zm0 2.25h.008v.008h-.008V15Zm0 2.25h.008v.008h-.008v-.008Zm2.25-4.5h.008v.008H16.5v-.008Zm0 2.25h.008v.008H16.5V15Z"
-              />
-            </svg>
-
-            <h1 className="text-xl text-gray-500">{data?.dateOfReg}</h1>
-          </div>
-          <hr />
-          <div className="w-full flex justify-center">
-            <button onClick={handleSignout} className="button mt-4 rounded-xl flex gap-2 items-center">
-              <span>Logout</span>
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="w-6 h-6 text-white"
+      <AnimatePresence mode="wait">
+        <motion.div
+          className="w-full flex flex-col flex-1 items-center p-4 overflow-y-auto"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          <motion.div className="w-full max-w-md" variants={itemVariants}>
+            <motion.div className="flex flex-col items-center mb-6" variants={itemVariants}>
+              <motion.div
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 15,
+                  delay: 0.2,
+                }}
+                whileHover={{
+                  scale: 1.05,
+                  transition: { duration: 0.2 },
+                }}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.25 9V5.25A2.25 2.25 0 0 1 10.5 3h6a2.25 2.25 0 0 1 2.25 2.25v13.5A2.25 2.25 0 0 1 16.5 21h-6a2.25 2.25 0 0 1-2.25-2.25V15m-3 0-3-3m0 0 3-3m-3 3H15"
-                />
-              </svg>
-            </button>
-          </div>
-        </div>
-          <div className="w-full flex justify-end pr-4 pb-1">
-            <Link href={'/credits'} className="text-primary underline">credits</Link>
-          </div>
-      </div>
-    );
-  } else {
-    return <Loading />;
-  }
-};
+                <Avatar className="h-24 w-24 bg-th-light-tan text-th-dark-green">
+                  <AvatarFallback className="text-3xl">{data.name.charAt(0)}</AvatarFallback>
+                </Avatar>
+              </motion.div>
+              <motion.h2
+                className="mt-4 text-2xl font-bold text-th-dark-green"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.5 }}
+              >
+                {data?.name}
+              </motion.h2>
+              <motion.p
+                className="text-th-medium-green uppercase"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.5, duration: 0.5 }}
+              >
+                {data?.id}
+              </motion.p>
+            </motion.div>
 
-export default Profile;
+            <motion.div
+              variants={itemVariants}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.6, duration: 0.5 }}
+            >
+              <Card className="border-none shadow-md mb-6">
+                <CardContent className="p-0">
+                  <ProfileItem
+                    icon={<User className="h-5 w-5 text-th-dark-green" />}
+                    label="Name"
+                    value={data?.name}
+                    delay={0.7}
+                  />
+                  <Separator />
+                  <ProfileItem
+                    icon={<IdCard className="h-5 w-5 text-th-dark-green" />}
+                    label="ID"
+                    value={data?.id}
+                    delay={0.8}
+                  />
+                  <Separator />
+                  <ProfileItem
+                    icon={<Mail className="h-5 w-5 text-th-dark-green" />}
+                    className={"text-sm"}
+                    label="Email"
+                    value={email}
+                    delay={0.9}
+                  />
+                  <Separator />
+                  <ProfileItem
+                    icon={<Calendar className="h-5 w-5 text-th-dark-green" />}
+                    label="Registered On"
+                    value={data?.dateOfReg}
+                    delay={1.0}
+                  />
+                </CardContent>
+              </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: 1.1,
+                duration: 0.5,
+                type: "spring",
+                stiffness: 300,
+                damping: 20,
+              }}
+              whileHover={{
+                scale: 1.03,
+                transition: { duration: 0.2 },
+              }}
+              whileTap={{
+                scale: 0.97,
+                transition: { duration: 0.1 },
+              }}
+            >
+              <Button onClick={handleSignout} className="w-full bg-th-dark-green hover:bg-th-medium-green text-white">
+                <motion.div
+                  className="flex items-center justify-center w-full"
+                  whileHover={{
+                    x: [0, -2, 2, -2, 0],
+                    transition: { duration: 0.5 },
+                  }}
+                >
+                  <LogOut className="mr-2 h-4 w-4" /> Sign Out
+                </motion.div>
+              </Button>
+            </motion.div>
+          </motion.div>
+        </motion.div>
+      </AnimatePresence>
+    )
+  } else {
+    return <Loading />
+  }
+}

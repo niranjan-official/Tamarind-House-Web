@@ -1,8 +1,8 @@
-import { Poppins } from "next/font/google";
+import { Josefin_Sans} from "next/font/google";
 import "./globals.css";
-import Head from "next/head";
+import { Toaster } from "@/components/ui/sonner"
 
-const poppins = Poppins({
+const poppins = Josefin_Sans({
   weight: ['400', '700'],
   subsets: ['latin'],
   display: 'swap',
@@ -23,6 +23,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
         <body className={poppins.className}>{children}</body>
+        <Toaster />
     </html>
   );
 }
