@@ -159,7 +159,7 @@ export default function TokenPage() {
         <h1 className="text-2xl font-bold text-th-dark-green">Today's Meal Token</h1>
         <div className="flex items-center text-th-medium-green mt-1">
           <CalendarClock className="h-4 w-4 mr-2" />
-          <span className="text-sm">
+          <span className="text-sm leading-3">
             {formattedDate} • {formattedTime}
           </span>
         </div>
