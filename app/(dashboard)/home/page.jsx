@@ -42,7 +42,6 @@ export default function TokenPage() {
 
   // Calculate progress for the time bar
   const updateProgress = () => {
-    if (!isValidTime) return
 
     const now = new Date()
     const start = new Date(now)
@@ -218,28 +217,6 @@ export default function TokenPage() {
           <LoadingSection key="loading" />
         )}
       </AnimatePresence>
-
-      {/* Today's menu preview */}
-      {/* <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 }}>
-        <Card className="mt-6 border-none shadow-md bg-white overflow-hidden">
-          <CardContent className="p-0">
-            <motion.div whileHover={{ backgroundColor: "rgba(232, 236, 215, 0.3)" }} className="p-4">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="font-medium text-th-dark-green flex items-center">
-                  <Utensils className="h-4 w-4 mr-2" /> Today's Special
-                </h3>
-                <Button variant="ghost" size="sm" className="text-th-medium-green h-8 px-2">
-                  View Menu
-                </Button>
-              </div>
-              <div className="space-y-2">
-                <MenuItem name="Vegetable Biryani" type="Veg" />
-                <MenuItem name="Chicken Curry" type="Non-veg" />
-              </div>
-            </motion.div>
-          </CardContent>
-        </Card>
-      </motion.div> */}
     </motion.div>
   )
 }
