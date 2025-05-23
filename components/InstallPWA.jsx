@@ -144,11 +144,12 @@ export default function InstallPWA({
                 >
                     {isInstalling ? (
                         <motion.div
-                            animate={{ rotate: 360 }}
-                            transition={{ repeat: Number.POSITIVE_INFINITY, duration: 1, ease: "linear" }}
+                            animate={{ opacity: [1, 0, 1] }}
+                            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                         >
                             <Download size={20} />
                         </motion.div>
+
                     ) : (
                         <Download size={20} />
                     )}
