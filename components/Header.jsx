@@ -3,13 +3,13 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { motion } from "framer-motion"
-import { Bell, RefreshCw } from "lucide-react"
+import { RefreshCw } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { usePathname } from "next/navigation"
 import Link from "next/link"
+import InstallPWA from "./InstallPWA"
 
 export default function Header() {
-  const [notifications, setNotifications] = useState(2)
   const [scrolled, setScrolled] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const pathname = usePathname()
@@ -63,21 +63,8 @@ export default function Header() {
 
           {/* Right side actions */}
           <div className="flex items-center gap-1">
-            {/* Notifications */}
-            <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }} className="relative">
-              <Button variant="ghost" size="icon" className="rounded-full h-9 w-9 text-th-medium-green">
-                <Bell size={20} />
-                {notifications > 0 && (
-                  <motion.span
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-1 right-1 h-4 w-4 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center"
-                  >
-                    {notifications}
-                  </motion.span>
-                )}
-              </Button>
-            </motion.div>
+            {/* PWA Install Button */}
+            <InstallPWA variant="icon" />
 
             {/* Refresh Button */}
             <motion.div whileHover={{ scale: 1.1 }} whileTap={{ scale: 0.9 }}>
@@ -87,6 +74,7 @@ export default function Header() {
                 className="rounded-full h-9 w-9 text-th-medium-green"
                 onClick={handleRefresh}
                 disabled={isRefreshing}
+                title="Refresh Page"
               >
                 <RefreshCw size={20} className={isRefreshing ? "animate-spin" : ""} />
               </Button>

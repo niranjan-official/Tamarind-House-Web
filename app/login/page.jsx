@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter } from "@/components/ui/card"
 import { HelpCircle, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -13,6 +13,7 @@ import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebas
 import { doc, getDoc, setDoc, getFirestore } from "firebase/firestore"
 import GenderSelectionDialog from "@/components/login/gender-selection-modal"
 import { motion, AnimatePresence } from "framer-motion"
+import InstallPWA from "@/components/InstallPWA"
 
 export default function Login() {
   const router = useRouter()
@@ -240,14 +241,21 @@ export default function Login() {
               <div className="mt-4 flex items-center justify-center text-sm text-th-dark-green hover:text-th-dark-green/80 transition-colors duration-200">
                 <HelpCircle className="w-4 h-4 mr-1" />
                 <span className="mt-[0.5px]">
-                  Having trouble?{' '}
-                  <a href="mailto:tamarind.house@providence.edu.in?subject=Support%20Request" className="font-medium underline hover:no-underline">
+                  Having trouble?{" "}
+                  <a
+                    href="mailto:tamarind.house@providence.edu.in?subject=Support%20Request"
+                    className="font-medium underline hover:no-underline"
+                  >
                     Get in touch
                   </a>
                 </span>
               </div>
-
             </CardContent>
+
+            {/* PWA Install Banner */}
+            <CardFooter className="pt-0">
+              <InstallPWA variant="banner" className="w-full mt-4" />
+            </CardFooter>
           </Card>
         </motion.div>
       </div>
