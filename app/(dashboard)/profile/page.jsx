@@ -13,6 +13,7 @@ import { toast } from "sonner"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Separator } from "@/components/ui/separator"
 import { motion, AnimatePresence } from "framer-motion"
+import InstallPWA from "@/components/InstallPWA"
 
 function ProfileItem({ icon, label, value, className, delay = 0 }) {
   return (
@@ -240,6 +241,15 @@ export default function Profile() {
                   />
                 </CardContent>
               </Card>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 1.1, duration: 0.5 }}
+              className="mb-6"
+            >
+              <InstallPWA variant="banner" />
             </motion.div>
 
             <motion.div
