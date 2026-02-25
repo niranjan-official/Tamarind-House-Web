@@ -158,6 +158,11 @@ export const checkTokenExistence = async (email) => {
   };
   try {
     const studentData = await getData(email);
+    if (!studentData.gender) {
+      status.err = "Gender not found";
+      return status;
+    }
+
     const currentDate = new Date();
 
     let timeChange = true;

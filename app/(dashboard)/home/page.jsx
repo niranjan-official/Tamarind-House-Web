@@ -14,6 +14,7 @@ import { Progress } from "@/components/ui/progress"
 import { toast } from "sonner"
 import { motion, AnimatePresence } from "framer-motion"
 import confetti from "canvas-confetti"
+import { useRouter } from "next/navigation"
 
 export default function TokenPage() {
   const [email, setEmail] = useState("")
@@ -26,6 +27,8 @@ export default function TokenPage() {
   const [currentTime, setCurrentTime] = useState(new Date())
   const [progress, setProgress] = useState(0)
   const [showConfetti, setShowConfetti] = useState(false)
+
+  const router = useRouter();
 
   // Get current server time and check if it's between 10 AM and 3 PM
   useEffect(() => {
@@ -81,6 +84,9 @@ export default function TokenPage() {
 
   const checkToken = async (email) => {
     const status = await checkTokenExistence(email)
+    if(status.err === "Gender not found"){
+      router.push("/login")
+    }
     if (status.tokenExist) {
       setTokenDispensedLoad(true)
       tokenCollectionStatus(status.token)
