@@ -103,15 +103,30 @@ export default function Login() {
   }
 
   const extractDetailsFromEmail = (email) => {
-    const match = email.match(/^[^.]+\.([a-z]+)(\d{2})([a-z]+)(\d+)@/i)
-    if (!match) return null
+    // New format: ashish.cy25009@student.providence.edu.in
+    // Pattern: name.<dept><year><seq>@...
+    const newMatch = email.match(/^[^.]+\.([a-z]+)(\d{2})(\d+)@/i)
+    if (newMatch) {
+      const id = `${newMatch[1]}${newMatch[2]}${newMatch[3]}`
+      const year = `20${newMatch[2]}`
+      const branchCode = newMatch[1].toLowerCase()
+      const branchToProgram = { mb: "mba", bb: "bba" }
+      const program = branchToProgram[branchCode] || "btech"
+      return { id, year, program }
+    }
 
-    const id = `${match[1]}${match[2]}${match[3]}${match[4]}`
-    const year = `20${match[2]}`
-    const branchCode = match[3].toLowerCase()
-    const program = ["mba", "bba"].includes(branchCode) ? branchCode : "btech"
+    // Old format: niranjan.prc22cs037@student.providence.edu.in
+    // Pattern: name.<college><year><branch><seq>@...
+    const oldMatch = email.match(/^[^.]+\.([a-z]+)(\d{2})([a-z]+)(\d+)@/i)
+    if (oldMatch) {
+      const id = `${oldMatch[1]}${oldMatch[2]}${oldMatch[3]}${oldMatch[4]}`
+      const year = `20${oldMatch[2]}`
+      const branchCode = oldMatch[3].toLowerCase()
+      const program = ["mba", "bba"].includes(branchCode) ? branchCode : "btech"
+      return { id, year, program }
+    }
 
-    return { id, year, program }
+    return null
   }
 
   const handleGenderSubmit = async (gender) => {
