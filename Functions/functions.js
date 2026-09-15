@@ -163,7 +163,7 @@ export const checkTokenExistence = async (email) => {
       return status;
     }
 
-    const currentDate = new Date();
+    const currentDate = await getCurrentServerTime();
 
     let timeChange = true;
     if (studentData.tokenTime) {
@@ -209,10 +209,10 @@ export const generateToken = async (email) => {
       const docSnap = await getDoc(tokenDocRef);
 
       if (docSnap.exists()) {
-        generateToken(email);
         console.log("Document already exists");
+        return generateToken(email);
       } else {
-        const date = new Date();
+        const date = await getCurrentServerTime();
         const time = getTimeFromDate(date);
         const batch = writeBatch(db);
 
@@ -242,7 +242,7 @@ export const generateToken = async (email) => {
   } else {
     status.tokenExist = true;
     status.token = checkToken.token;
-    status.time = checkToken.tokenTime;
+    status.time = checkToken.time;
   }
   return status;
 };
@@ -325,6 +325,13 @@ export const getServerDate = async () => {
   });
   console.log("ServerTime: ", istTime);
   return istTime;
+};
+
+// Current time from the server (immune to device clock manipulation), used for
+// the once-per-day token check and for stamping generated tokens
+const getCurrentServerTime = async () => {
+  const istTime = await getServerDate();
+  return new Date(istTime);
 };
 
 export function isTimeBetween10AMAnd3PM(inputDateString) {

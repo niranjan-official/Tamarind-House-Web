@@ -133,6 +133,12 @@ export default function TokenPage() {
       setTimeout(() => {
         triggerConfetti()
       }, 500)
+    } else if (status.tokenExist) {
+      setTokenDispensedLoad(true)
+      tokenCollectionStatus(status.token)
+      setToken(status.token)
+      setTime(status.time)
+      toast.info("You already have a token for today.")
     } else if (status.err) {
       toast.error("Failed to generate token. Please try again.")
     }
