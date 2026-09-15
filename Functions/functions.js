@@ -147,8 +147,8 @@ export const generateOTP = () => {
   return randomNumber;
 };
 
-// Check whether the user have already generated token on that particular day
-export const checkTokenExistence = async (email) => {
+// Check whether the user have already generated a token of this meal type today
+export const checkTokenExistence = async (email, mealType, currentDate) => {
   let status = {
     data: null,
     tokenExist: false,
@@ -163,21 +163,23 @@ export const checkTokenExistence = async (email) => {
       return status;
     }
 
-    const currentDate = await getCurrentServerTime();
+    const now = currentDate || (await getCurrentServerTime());
+    const tokenField = `${mealType}Token`;
+    const tokenTimeField = `${mealType}TokenTime`;
 
     let timeChange = true;
-    if (studentData.tokenTime) {
+    if (studentData[tokenTimeField]) {
       timeChange = isDateGreaterThan(
-        convertTime(studentData.tokenTime),
-        currentDate
+        convertTime(studentData[tokenTimeField]),
+        now
       );
     }
     if (timeChange) {
       status.data = studentData;
     } else {
-      const newTime = convertTime(studentData.tokenTime);
+      const newTime = convertTime(studentData[tokenTimeField]);
       status.tokenExist = true;
-      status.token = studentData.token;
+      status.token = studentData[tokenField];
       status.time = getTimeFromDate(newTime);
     }
   } catch (e) {
@@ -187,8 +189,8 @@ export const checkTokenExistence = async (email) => {
   return status;
 };
 
-// Generates token for the user
-export const generateToken = async (email) => {
+// Generates a token of the given meal type ("lunch" or "snacks") for the user
+export const generateToken = async (email, mealType) => {
   let studentData;
   let status = {
     success: false,
@@ -198,7 +200,13 @@ export const generateToken = async (email) => {
     err: null,
   };
 
-  const checkToken = await checkTokenExistence(email);
+  const currentDate = await getCurrentServerTime();
+  if (getMealType(currentDate) !== mealType) {
+    status.err = "This meal's service window is not currently open.";
+    return status;
+  }
+
+  const checkToken = await checkTokenExistence(email, mealType, currentDate);
 
   if (checkToken.data) {
     try {
@@ -210,10 +218,9 @@ export const generateToken = async (email) => {
 
       if (docSnap.exists()) {
         console.log("Document already exists");
-        return generateToken(email);
+        return generateToken(email, mealType);
       } else {
-        const date = await getCurrentServerTime();
-        const time = getTimeFromDate(date);
+        const time = getTimeFromDate(currentDate);
         const batch = writeBatch(db);
 
         batch.set(tokenDocRef, {
@@ -221,14 +228,15 @@ export const generateToken = async (email) => {
           id: studentData.id,
           generationTime: time,
           isCollected: false,
-          date: formatDate(date),
+          date: formatDate(currentDate),
           gender: studentData.gender,
+          mealType,
         });
 
         const studentRef = doc(db, "users", email);
         batch.update(studentRef, {
-          token: tokenNumber,
-          tokenTime: date,
+          [`${mealType}Token`]: tokenNumber,
+          [`${mealType}TokenTime`]: currentDate,
         });
         await batch.commit();
         status.success = true;
@@ -303,8 +311,10 @@ export const getData = async (email) => {
         id: docSnap.data().id,
         name: docSnap.data().name,
         dateOfReg: docSnap.data().dateOfReg,
-        token: docSnap.data().token,
-        tokenTime: docSnap.data().tokenTime,
+        lunchToken: docSnap.data().lunchToken,
+        lunchTokenTime: docSnap.data().lunchTokenTime,
+        snacksToken: docSnap.data().snacksToken,
+        snacksTokenTime: docSnap.data().snacksTokenTime,
         gender: docSnap.data().gender,
       };
       return data;
@@ -334,15 +344,19 @@ const getCurrentServerTime = async () => {
   return new Date(istTime);
 };
 
-export function isTimeBetween10AMAnd3PM(inputDateString) {
-  // Parse the input date string into a Date object
-  const date = new Date(inputDateString);
+// Meal service windows: single source of truth for both gating logic and UI copy
+export const MEAL_WINDOWS = {
+  lunch: { start: 10, end: 14, label: "Lunch", window: "10:00 AM – 2:00 PM" },
+  snacks: { start: 14, end: 17, label: "Snacks", window: "2:00 PM – 5:00 PM" },
+};
 
-  // Extract the hour component
-  const hour = date.getHours();
-
-  // Check if the hour is between 10AM (10) and 3PM (15)
-  return hour >= 10 && hour < 15;
+// Returns "lunch", "snacks", or null (outside service hours) for the given date
+export function getMealType(date) {
+  const hour = new Date(date).getHours();
+  for (const [type, { start, end }] of Object.entries(MEAL_WINDOWS)) {
+    if (hour >= start && hour < end) return type;
+  }
+  return null;
 }
 
 // converts the date from firebase to normal format

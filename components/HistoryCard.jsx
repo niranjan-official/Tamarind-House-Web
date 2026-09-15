@@ -2,13 +2,18 @@ import { Calendar, Clock } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 
-export default function HistoryCard({ tokenNumber, dispenseTime, generationTime, date }) {
+export default function HistoryCard({ tokenNumber, dispenseTime, generationTime, date, mealType }) {
   return (
     <Card className="w-full overflow-hidden border-none shadow-md">
       <CardContent className="p-4 flex justify-between">
         <div className="flex flex-col justify-between gap-2">
           <div className="flex items-center gap-2">
             <span className="text-2xl font-bold text-th-dark-green">{tokenNumber}</span>
+            {mealType && (
+              <Badge variant="outline" className="bg-th-light-cream text-th-dark-green border-th-medium-green/30 capitalize font-normal">
+                {mealType}
+              </Badge>
+            )}
           </div>
           {dispenseTime ? (
             <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200 pt-1 font-normal">

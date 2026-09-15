@@ -48,6 +48,7 @@ export default function History() {
                 dispenseTime={obj.value.Printing_time}
                 generationTime={obj.value.generationTime}
                 date={obj.value.date}
+                mealType={obj.value.mealType}
               />
             ))}
         </div>
